@@ -76,6 +76,8 @@
   .card:hover{border-color:#fff;}
     .card:focus-visible{outline:3px solid var(--accent);outline-offset:3px;}
   .art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-1;}  .card.no-crop .art{object-fit:contain;background:#000;}
+  .card.blur-fill .art{background:transparent;}
+  .art-fill{position:absolute;inset:-20px;width:calc(100% + 40px);height:calc(100% + 40px);object-fit:cover;filter:blur(14px) brightness(.55);z-index:-2;}
   .name{
     position:absolute;inset:0;display:grid;place-items:center;
     font-size:clamp(20px,2.6vw,32px);font-weight:600;color:#fff;
@@ -134,7 +136,7 @@
     <p class="empty" id="all-empty" hidden>no games match that search.</p>
   </section>
 
-  <footer>slope, papa's freezeria, subway surfers, retro bowl, five nights at einsteins, aquapark.io, snow rider 3d, and baldis basic are live.</footer>
+  <footer>slope, papa's freezeria, subway surfers, retro bowl, five nights at einsteins, aquapark.io, snow rider 3d, baldis basic, and soflo wheelie life are live.</footer>
 </div>
 
 <script>
@@ -164,7 +166,8 @@ const GAMES = [
   { id:"five",  name:"five nights at einsteins", cat:"arcade", art:"games/five-nights-at-einsteins/assets/images/Cam8.png", href:"games/five-nights-at-einsteins/" },
   { id:"six",   name:"aquapark.io", cat:"arcade", art:"games/aquapark-io/banner.jpg", href:"games/aquapark-io/" },
   { id:"seven", name:"snow rider 3d", cat:"arcade", art:"games/snowrider3d/banner.svg", href:"games/snowrider3d/" },
-  { id:"eight", name:"baldis basic", cat:"arcade", art:"games/baldisbasics/banner.svg", href:"games/baldisbasics/", noCrop:true }
+  { id:"eight", name:"baldis basic", cat:"arcade", art:"games/baldisbasics/banner.svg", href:"games/baldisbasics/", noCrop:true },
+  { id:"nine",  name:"soflo wheelie life", cat:"arcade", art:"https://cdn2.scratch.mit.edu/get_image/project/1231016758_480x360.png", href:"games/soflowheelielife/", noCrop:true, blurFill:true }
 ];
 
 let starred = new Set();
@@ -176,10 +179,11 @@ let cat = "all", query = "";
 function card(g){
   const on = starred.has(g.id);
   const el = document.createElement("a");
-  el.className = "card" + (g.wide ? " wide-banner" : "") + (g.noCrop ? " no-crop" : "");
+  el.className = "card" + (g.wide ? " wide-banner" : "") + (g.noCrop ? " no-crop" : "") + (g.blurFill ? " blur-fill" : "");
   el.href = g.href || "#";
   if (g.href) { el.target = "_blank"; el.rel = "noopener"; }
   el.innerHTML =
+    (g.blurFill ? '<img class="art-fill" src="' + g.art + '" alt="">' : '') +
     '<img class="art" src="' + g.art + '" alt="">' +
     '<span class="name">' + g.name + '</span>' +
     '<button class="star" aria-pressed="' + on + '" aria-label="star ' + g.name + '">' +
