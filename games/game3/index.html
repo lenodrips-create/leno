@@ -9,6 +9,31 @@
         document.domain = '4399.com'
     </script>
     <script type="text/javascript" src="4399.js"></script>
+    <style>
+        /* Keep the Unity canvas fully inside the viewport instead of allowing the
+           loader's aspect-ratio box to extend past the bottom of the screen. */
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+        #game-container {
+            position: fixed !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            margin: 0 !important;
+        }
+        #game,
+        #game canvas {
+            width: 100% !important;
+            height: 100% !important;
+            max-width: 100vw;
+            max-height: 100vh;
+        }
+    </style>
     <script>
         window.config = {
             loader: 'unity',
