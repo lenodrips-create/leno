@@ -10,15 +10,9 @@ html,body{width:100%;height:100%;margin:0;background:#000;overflow:hidden}
 .webgl-content,#unityContainer,#gameContainer{width:100%!important;height:100%!important;margin:0!important;padding:0!important}
 </style>
 <script src="https://cdn.jsdelivr.net/gh/bubbls/UGS-Assets@main/baldis-basics/TemplateData/UnityProgress.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/bubbls/UGS-Assets@main/baldis-basics/baldi.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/bubbls/UGS-Assets@main/merge.js"></script>
-</head>
-<body>
-<div class="webgl-content">
-  <div id="unityContainer">
-    <div id="gameContainer"></div>
-  </div>
-</div>
+<script src="https://cdn.jsdelivr.net/gh/bubbls/UGS-Assets@main/baldis-basics/TemplateData/UnityProgress.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/bubbls/UGS-Assets@main/baldis-basics/baldi.js"></script>
 <script>
 window.fileMergerConfig={
   files:[
@@ -29,6 +23,15 @@ window.fileMergerConfig={
   basePath:"https://cdn.jsdelivr.net/gh/bubbls/UGS-Assets@main/baldis-basics/unity/",
   debug:false
 };
+</script>
+</head>
+<body>
+<div class="webgl-content">
+  <div id="unityContainer">
+    <div id="gameContainer"></div>
+  </div>
+</div>
+<script>
 var gameInstance=UnityLoader.instantiate(
   "gameContainer",
   "https://cdn.jsdelivr.net/gh/bubbls/UGS-Assets@main/baldis-basics/baldi.json",
