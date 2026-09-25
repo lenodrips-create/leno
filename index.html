@@ -99,17 +99,14 @@
 
   <header class="top">
     <div class="brand">games</div>
-    <nav><a href="#">home</a><a href="#">about</a><a href="#">github</a></nav>
   </header>
 
   <div class="search">
     <input id="q" type="search" placeholder="search games" aria-label="search games">
   </div>
 
-  <section>
-    <h2>starred games</h2>
+  <section id="starred-section" hidden>
     <div class="grid" id="starred"></div>
-    <p class="empty" id="starred-empty">star a game to pin it here.</p>
   </section>
 
   <section>
@@ -203,7 +200,7 @@ function render(){
 
   const fav = GAMES.filter(g => starred.has(g.id));
   fav.forEach(g => star.appendChild(card(g)));
-  document.getElementById("starred-empty").hidden = fav.length > 0;
+  document.getElementById("starred-section").hidden = fav.length === 0;
 }
 
 document.getElementById("q").addEventListener("input", e => {
