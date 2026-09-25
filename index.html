@@ -75,7 +75,7 @@
   }
   .card:hover{border-color:#fff;}
     .card:focus-visible{outline:3px solid var(--accent);outline-offset:3px;}
-  .art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-1;}
+  .art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-1;}  .card.no-crop .art{object-fit:contain;background:#000;}
   .name{
     position:absolute;inset:0;display:grid;place-items:center;
     font-size:clamp(20px,2.6vw,32px);font-weight:600;color:#fff;
@@ -159,12 +159,12 @@ function placeholderArt(a, b){
 const GAMES = [
   { id:"one",   name:"slope",      cat:"arcade",     art:"games/slope/banner.jpg", href:"games/slope/" },
   { id:"two",   name:"papa's freezeria", cat:"simulation", art:"games/papasfreezeria/banner.jpg", href:"games/papasfreezeria/" },
-  { id:"three", name:"subway surfers", cat:"arcade", art:"games/game3/banner.jpg", href:"games/game3/" },
+  { id:"three", name:"subway surfers", cat:"arcade", art:"games/game3/banner.jpg", href:"games/game3/", noCrop:true },
   { id:"four",  name:"retro bowl", cat:"arcade", art:"games/game4/retrobowl-banner.svg", href:"games/game4/" },
   { id:"five",  name:"five nights at einsteins", cat:"arcade", art:"games/five-nights-at-einsteins/assets/images/Cam8.png", href:"games/five-nights-at-einsteins/" },
   { id:"six",   name:"aquapark.io", cat:"arcade", art:"games/aquapark-io/banner.jpg", href:"games/aquapark-io/" },
   { id:"seven", name:"snow rider 3d", cat:"arcade", art:"games/snowrider3d/banner.svg", href:"games/snowrider3d/" },
-  { id:"eight", name:"baldis basic", cat:"arcade", art:"games/baldisbasics/banner.svg", href:"games/baldisbasics/" }
+  { id:"eight", name:"baldis basic", cat:"arcade", art:"games/baldisbasics/banner.svg", href:"games/baldisbasics/", noCrop:true }
 ];
 
 let starred = new Set();
@@ -176,7 +176,7 @@ let cat = "all", query = "";
 function card(g){
   const on = starred.has(g.id);
   const el = document.createElement("a");
-  el.className = "card" + (g.wide ? " wide-banner" : "");
+  el.className = "card" + (g.wide ? " wide-banner" : "") + (g.noCrop ? " no-crop" : "");
   el.href = g.href || "#";
   if (g.href) { el.target = "_blank"; el.rel = "noopener"; }
   el.innerHTML =
