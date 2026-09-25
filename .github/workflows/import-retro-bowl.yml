@@ -1,0 +1,114 @@
+name: Import Retro Bowl game 4
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'games/game4/.banner_parts/**'
+      - '.github/workflows/import-retro-bowl.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Import the uploaded Retro Bowl game
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/jeweled
+          git clone --depth 1 https://github.com/Durvated/Jeweled.git /tmp/jeweled
+          rm -rf games/game4/html5game
+          mkdir -p games/game4
+          cp -R /tmp/jeweled/Games/Games/Popular/retrobowl/. games/game4/
+
+          cat games/game4/.banner_parts/*.b64 | tr -d '\n\r ' | base64 -d > games/game4/retrobowl.jpg
+          rm -rf games/game4/.banner_parts
+
+          cat > games/game4/index.html <<'EOF'
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Retro Bowl</title>
+  <style>
+    :root { color-scheme: dark; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: #316afc;
+    }
+    body {
+      display: grid;
+      place-items: center;
+      touch-action: none;
+    }
+    #game-wrap {
+      width: min(100vw, calc(100vh * 853 / 480));
+      height: min(100vh, calc(100vw * 480 / 853));
+      max-width: 100vw;
+      max-height: 100vh;
+      overflow: hidden;
+      background: #316afc;
+    }
+    #canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      image-rendering: optimizeSpeed;
+      -webkit-interpolation-mode: nearest-neighbor;
+      -ms-touch-action: none;
+      touch-action: none;
+    }
+    @media (orientation: portrait) {
+      #game-wrap {
+        width: 100vw;
+        height: calc(100vw * 480 / 853);
+        max-height: 100vh;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="game-wrap">
+    <canvas id="canvas" width="853" height="480">
+      <p>Your browser doesn't support HTML5 canvas.</p>
+    </canvas>
+  </div>
+  <script src="html5game/RetroBowl.js"></script>
+  <script>
+    window.addEventListener("load", function () {
+      if (typeof GameMaker_Init === "function") GameMaker_Init();
+    });
+  </script>
+</body>
+</html>
+EOF
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add games/game4
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Add Retro Bowl as game 4"
+            git push
+          fi
+
+          rm -f .github/workflows/import-retro-bowl.yml
+          git add .github/workflows/import-retro-bowl.yml
+          if ! git diff --cached --quiet; then
+            git commit -m "Remove temporary Retro Bowl import workflow"
+            git push
+          fi
