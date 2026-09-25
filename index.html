@@ -41,7 +41,7 @@
   .top nav a{color:var(--muted);text-decoration:none;font-size:13px;}
   .top nav a:hover,.top nav a:focus-visible{color:var(--text);}
 
-  .search{margin:20px 0 14px;}
+  .search{margin:20px auto 30px;max-width:320px;}
   .search input{
     width:100%;padding:11px 14px;border-radius:10px;
     border:1px solid var(--line);background:var(--panel);
@@ -50,15 +50,6 @@
   .search input::placeholder{color:var(--muted);}
   .search input:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
 
-  .cats{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:30px;}
-  .cats button{
-    border:1px solid var(--line);background:var(--panel);color:var(--muted);
-    font:inherit;font-size:13px;text-transform:lowercase;
-    padding:6px 14px;border-radius:999px;cursor:pointer;
-  }
-  .cats button:hover{color:var(--text);}
-  .cats button[aria-pressed="true"]{background:#fff;border-color:#fff;color:#000;}
-  .cats button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 
   h2{font-size:14px;font-weight:600;color:var(--muted);margin:0 0 12px;}
   section{margin-bottom:36px;}
@@ -95,7 +86,6 @@
 
   .empty{color:var(--muted);font-size:13px;border:1px dashed var(--line);
          border-radius:14px;padding:22px;text-align:center;}
-  footer{border-top:1px solid var(--line);padding-top:16px;color:var(--muted);font-size:12px;text-align:center;}
   @media (max-width:760px){.grid{grid-template-columns:repeat(2,1fr);}
     .name{font-size:clamp(20px,4vw,30px);}}
   @media (max-width:480px){.grid{grid-template-columns:1fr;}
@@ -116,14 +106,6 @@
     <input id="q" type="search" placeholder="search games" aria-label="search games">
   </div>
 
-  <div class="cats" role="group" aria-label="filter by category">
-    <button aria-pressed="true" data-cat="all">all</button>
-    <button aria-pressed="false" data-cat="arcade">arcade</button>
-    <button aria-pressed="false" data-cat="platformer">platformer</button>
-    <button aria-pressed="false" data-cat="puzzle">puzzle</button>
-    <button aria-pressed="false" data-cat="simulation">simulation</button>
-  </div>
-
   <section>
     <h2>starred games</h2>
     <div class="grid" id="starred"></div>
@@ -136,7 +118,6 @@
     <p class="empty" id="all-empty" hidden>no games match that search.</p>
   </section>
 
-  <footer>slope, papa's freezeria, subway surfers, retro bowl, five nights at einsteins, aquapark.io, snow rider 3d, baldis basic, soflo wheelie life, backrooms escape, cuphead, minecraft 1.5.2, rocket soccer, super mario 64, basketball stars, among us, 1v1.lol, donkey kong, and super hot are live.</footer>
 </div>
 
 <script>
@@ -184,7 +165,7 @@ let starred = new Set();
 try { starred = new Set(JSON.parse(localStorage.getItem("starred") || "[]")); } catch (e) {}
 function save(){ try { localStorage.setItem("starred", JSON.stringify([...starred])); } catch (e) {} }
 
-let cat = "all", query = "";
+let query = "";
 
 function card(g){
   const on = starred.has(g.id);
@@ -211,7 +192,7 @@ function render(){
   const star = document.getElementById("starred");
   all.innerHTML = ""; star.innerHTML = "";
 
-  const shown = GAMES.filter(g => (cat === "all" || g.cat === cat) && g.name.includes(query));
+  const shown = GAMES.filter(g => g.name.includes(query));
   shown.forEach(g => all.appendChild(card(g)));
   document.getElementById("all-empty").hidden = shown.length > 0;
 
@@ -219,14 +200,6 @@ function render(){
   fav.forEach(g => star.appendChild(card(g)));
   document.getElementById("starred-empty").hidden = fav.length > 0;
 }
-
-document.querySelectorAll(".cats button").forEach(b => {
-  b.addEventListener("click", () => {
-    cat = b.dataset.cat;
-    document.querySelectorAll(".cats button").forEach(o => o.setAttribute("aria-pressed", String(o === b)));
-    render();
-  });
-});
 
 document.getElementById("q").addEventListener("input", e => {
   query = e.target.value.trim().toLowerCase();
