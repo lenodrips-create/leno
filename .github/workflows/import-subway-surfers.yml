@@ -1,0 +1,41 @@
+name: Import original Subway Surfers game
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Leno
+        uses: actions/checkout@v4
+
+      - name: Download original game files
+        run: |
+          rm -rf /tmp/subwaysurfer
+          git clone --depth 1 https://github.com/testingherokuapp/subwaysurfer.git /tmp/subwaysurfer
+          mkdir -p games/game3/Build
+
+          cp /tmp/subwaysurfer/index.html games/game3/index.html
+          cp /tmp/subwaysurfer/UnityLoader.2019.2.js games/game3/
+          cp /tmp/subwaysurfer/4399.js games/game3/
+          cp /tmp/subwaysurfer/unity.js games/game3/
+          cp /tmp/subwaysurfer/poki-sdk.js games/game3/
+          cp /tmp/subwaysurfer/poki-sdk-core.js games/game3/
+          cp /tmp/subwaysurfer/master-loader.js games/game3/
+          cp /tmp/subwaysurfer/prebid4.12.0.js games/game3/
+          cp /tmp/subwaysurfer/Build/SanFrancisco.json games/game3/Build/
+          cp /tmp/subwaysurfer/Build/SanFrancisco.data.unityweb games/game3/Build/
+          cp /tmp/subwaysurfer/Build/SanFrancisco.wasm.code.unityweb games/game3/Build/
+          cp /tmp/subwaysurfer/Build/SanFrancisco.wasm.framework.unityweb games/game3/Build/
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add games/game3
+          git rm -f .github/workflows/import-subway-surfers.yml
+          git commit -m "Import original Subway Surfers game files"
+          git push
