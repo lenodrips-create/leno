@@ -2,20 +2,18 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>aquapark.io</title>
-  <meta http-equiv="refresh" content="0; url=https://www.yad.com/games/Aquapark-Io/index.html">
   <style>
-    html,body{margin:0;width:100%;height:100%;background:#000;color:#fff;font-family:Arial,sans-serif}
-    body{display:flex;align-items:center;justify-content:center;text-align:center}
-    a{color:#fff}
+    html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000}
+    #gameContainer{width:100vw;height:100vh}
   </style>
+  <script src="Build/UnityLoader.js"></script>
 </head>
 <body>
-  <div>
-    <p>Loading aquapark.io…</p>
-    <p><a href="https://www.yad.com/games/Aquapark-Io/index.html">Open game</a></p>
-  </div>
-  <script>window.location.replace("https://www.yad.com/games/Aquapark-Io/index.html");</script>
+  <div id="gameContainer"></div>
+  <script>
+    var gameInstance = UnityLoader.instantiate("gameContainer", "Build/WaterParkSlides3Dx2.json", { onProgress: function(){} });
+  </script>
 </body>
 </html>
