@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>games</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#000000;
+    --panel:#101014;
+    --line:#2a2a33;
+    --text:#ffffff;
+    --muted:#8b8f9c;
+    --accent:#4ade4a;
+    --star:#ffffff;
+    color-scheme:dark;
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Open Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    font-size:15px;line-height:1.5;
+    text-transform:lowercase;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1100px;margin:0 auto;padding:26px 18px 70px;}
+
+  .top{display:flex;flex-wrap:wrap;align-items:center;gap:14px;
+       padding-bottom:16px;border-bottom:1px solid var(--line);}
+  .brand{font-size:20px;font-weight:700;letter-spacing:-.02em;margin-right:auto;}
+  .top nav{display:flex;gap:16px;}
+  .top nav a{color:var(--muted);text-decoration:none;font-size:13px;}
+  .top nav a:hover,.top nav a:focus-visible{color:var(--text);}
+
+  .search{margin:20px 0 14px;}
+  .search input{
+    width:100%;padding:11px 14px;border-radius:10px;
+    border:1px solid var(--line);background:var(--panel);
+    color:var(--text);font:inherit;text-transform:lowercase;
+  }
+  .search input::placeholder{color:var(--muted);}
+  .search input:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+
+  .cats{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:30px;}
+  .cats button{
+    border:1px solid var(--line);background:var(--panel);color:var(--muted);
+    font:inherit;font-size:13px;text-transform:lowercase;
+    padding:6px 14px;border-radius:999px;cursor:pointer;
+  }
+  .cats button:hover{color:var(--text);}
+  .cats button[aria-pressed="true"]{background:#fff;border-color:#fff;color:#000;}
+  .cats button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  h2{font-size:14px;font-weight:600;color:var(--muted);margin:0 0 12px;}
+  section{margin-bottom:36px;}
+
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+
+  /* banner card */
+  .card{
+    position:relative;display:block;text-decoration:none;color:inherit;
+    aspect-ratio:16/7;
+    border:3px solid #d5d7dd;border-radius:18px;
+    overflow:hidden;background:#000;
+    isolation:isolate;
+  }
+  .card:hover{border-color:#fff;}
+  .card:focus-visible{outline:3px solid var(--accent);outline-offset:3px;}
+  .art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-1;}
+  .name{
+    position:absolute;inset:0;display:grid;place-items:center;
+    font-size:clamp(20px,2.6vw,32px);font-weight:600;color:#fff;
+    text-shadow:0 2px 10px rgba(0,0,0,.85),0 0 3px rgba(0,0,0,.9);
+    padding:0 40px;text-align:center;
+  }
+  .star{
+    position:absolute;top:8px;right:12px;
+    background:none;border:0;padding:2px;cursor:pointer;
+    color:var(--star);font-size:26px;line-height:1;
+    text-shadow:0 1px 6px rgba(0,0,0,.9);
+  }
+  .star[aria-pressed="true"]{color:#ffd84a;}
+  .star:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:5px;}
+
+  .empty{color:var(--muted);font-size:13px;border:1px dashed var(--line);
+         border-radius:14px;padding:22px;text-align:center;}
+  footer{border-top:1px solid var(--line);padding-top:16px;color:var(--muted);font-size:12px;text-align:center;}
+  @media (max-width:760px){.grid{grid-template-columns:repeat(2,1fr);}
+    .name{font-size:clamp(20px,4vw,30px);}}
+  @media (max-width:480px){.grid{grid-template-columns:1fr;}
+    .card{aspect-ratio:16/5;}
+    .name{font-size:32px;}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">games</div>
+    <nav><a href="#">home</a><a href="#">about</a><a href="#">github</a></nav>
+  </header>
+
+  <div class="search">
+    <input id="q" type="search" placeholder="search games" aria-label="search games">
+  </div>
+
+  <div class="cats" role="group" aria-label="filter by category">
+    <button aria-pressed="true" data-cat="all">all</button>
+    <button aria-pressed="false" data-cat="arcade">arcade</button>
+    <button aria-pressed="false" data-cat="platformer">platformer</button>
+    <button aria-pressed="false" data-cat="puzzle">puzzle</button>
+    <button aria-pressed="false" data-cat="simulation">simulation</button>
+  </div>
+
+  <section>
+    <h2>starred games</h2>
+    <div class="grid" id="starred"></div>
+    <p class="empty" id="starred-empty">star a game to pin it here.</p>
+  </section>
+
+  <section>
+    <h2>all games</h2>
+    <div class="grid" id="all"></div>
+    <p class="empty" id="all-empty" hidden>no games match that search.</p>
+  </section>
+
+  <footer>slope and papa's freezeria are live · 1 placeholder slot — swap in artwork and links when your games are ready.</footer>
+</div>
+
+<script>
+/* placeholder artwork: swap `art` for an image path when you have one */
+function placeholderArt(a, b){
+  const svg =
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 100" preserveAspectRatio="none">' +
+      '<defs>' +
+        '<linearGradient id="g" x1="0" y1="0" x2="1" y2="1">' +
+          '<stop offset="0" stop-color="' + a + '"/><stop offset="1" stop-color="' + b + '"/>' +
+        '</linearGradient>' +
+        '<pattern id="p" width="20" height="20" patternUnits="userSpaceOnUse">' +
+          '<path d="M20 0H0V20" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="1"/>' +
+        '</pattern>' +
+      '</defs>' +
+      '<rect width="320" height="100" fill="url(#g)"/>' +
+      '<rect width="320" height="100" fill="url(#p)"/>' +
+    '</svg>';
+  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+}
+
+const GAMES = [
+  { id:"one",   name:"slope",      cat:"arcade",     art:"games/slope/banner.jpg", href:"games/slope/" },
+  { id:"two",   name:"papa's freezeria", cat:"simulation", art:"games/papasfreezeria/banner.jpg", href:"games/papasfreezeria/" },
+  { id:"three", name:"game three", cat:"puzzle",     art:placeholderArt("#3d2418","#0a0605") }
+];
+
+let starred = new Set();
+try { starred = new Set(JSON.parse(localStorage.getItem("starred") || "[]")); } catch (e) {}
+function save(){ try { localStorage.setItem("starred", JSON.stringify([...starred])); } catch (e) {} }
+
+let cat = "all", query = "";
+
+function card(g){
+  const on = starred.has(g.id);
+  const el = document.createElement("a");
+  el.className = "card";
+  el.href = g.href || "#";
+  if (g.href) { el.target = "_blank"; el.rel = "noopener"; }
+  el.innerHTML =
+    '<img class="art" src="' + g.art + '" alt="">' +
+    '<span class="name">' + g.name + '</span>' +
+    '<button class="star" aria-pressed="' + on + '" aria-label="star ' + g.name + '">' +
+    (on ? "\u2605" : "\u2606") + '</button>';
+  el.querySelector(".star").addEventListener("click", e => {
+    e.preventDefault(); e.stopPropagation();
+    starred.has(g.id) ? starred.delete(g.id) : starred.add(g.id);
+    save(); render();
+  });
+  return el;
+}
+
+function render(){
+  const all = document.getElementById("all");
+  const star = document.getElementById("starred");
+  all.innerHTML = ""; star.innerHTML = "";
+
+  const shown = GAMES.filter(g => (cat === "all" || g.cat === cat) && g.name.includes(query));
+  shown.forEach(g => all.appendChild(card(g)));
+  document.getElementById("all-empty").hidden = shown.length > 0;
+
+  const fav = GAMES.filter(g => starred.has(g.id));
+  fav.forEach(g => star.appendChild(card(g)));
+  document.getElementById("starred-empty").hidden = fav.length > 0;
+}
+
+document.querySelectorAll(".cats button").forEach(b => {
+  b.addEventListener("click", () => {
+    cat = b.dataset.cat;
+    document.querySelectorAll(".cats button").forEach(o => o.setAttribute("aria-pressed", String(o === b)));
+    render();
+  });
+});
+
+document.getElementById("q").addEventListener("input", e => {
+  query = e.target.value.trim().toLowerCase();
+  render();
+});
+
+render();
+</script>
+</body>
+</html>

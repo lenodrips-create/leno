@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>papa's freezeria</title>
+  <style>
+    html, body { margin: 0; height: 100%; overflow: hidden; background: #000; }
+    #ruffle { width: 100%; height: 100%; }
+  </style>
+  <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+</head>
+<body>
+  <div id="ruffle"></div>
+  <script>
+    window.addEventListener("load", function () {
+      var player = window.RufflePlayer.newest().createPlayer();
+      player.style.width = "100%";
+      player.style.height = "100%";
+      document.getElementById("ruffle").appendChild(player);
+      player.load("papasfreezeria.swf");
+    });
+  </script>
+</body>
+</html>

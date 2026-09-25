@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>slope</title>
+  <style>
+    html, body { margin: 0; height: 100%; overflow: hidden; background: #000; }
+    .webgl-content, #gameContainer { width: 100%; height: 100%; }
+    #gameContainer canvas { display: block; width: 100%; height: 100%; }
+
+    /* loading bar used by UnityProgress.js */
+    .logo { display: none; }
+    .progress { position: absolute; left: 50%; top: 50%; width: 240px; height: 6px;
+                margin: -3px 0 0 -120px; background: #10331a; border-radius: 3px; overflow: hidden; }
+    .progress .empty { float: right; height: 100%; }
+    .progress .full { float: left; height: 100%; background: #4ade4a; }
+
+    .fullscreen { position: absolute; bottom: 1vh; left: 1vw; border: 0; border-radius: 8px;
+                  background: rgba(255,255,255,.85); color: #000; padding: 8px 10px; cursor: pointer; line-height: 0; }
+    .fullscreen:hover { background: #fff; }
+  </style>
+  <script src="UnityProgress.js"></script>
+  <script src="UnityLoader.js"></script>
+  <script>
+    var unityInstance = window.unityInstance = UnityLoader.instantiate("gameContainer", "slope_new.json", {
+      onProgress: UnityProgress,
+      Module: { onRuntimeInitialized: function () { UnityProgress(window.unityInstance, "complete"); } }
+    });
+  </script>
+</head>
+<body>
+  <div class="webgl-content">
+    <div id="gameContainer"></div>
+  </div>
+  <button class="fullscreen" type="button" aria-label="fullscreen" onclick="window.unityInstance.SetFullscreen(1)">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+      <path d="M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1h-4zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5zM.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5z"/>
+    </svg>
+  </button>
+</body>
+</html>
