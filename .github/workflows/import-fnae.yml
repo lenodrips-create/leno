@@ -1,0 +1,73 @@
+name: Import Five Nights at Einsteins
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/import-fnae.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  import-game:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out leno
+        uses: actions/checkout@v4
+
+      - name: Import the uploaded game's matching source
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          rm -rf /tmp/fnae
+          git clone --depth 1 https://github.com/n1yshi/Five-Nights-at-Epstein.git /tmp/fnae
+
+          rm -rf games/game5
+          mkdir -p games/game5
+
+          cp -R /tmp/fnae/. games/game5/
+          rm -f games/game5/CNAME
+
+          # Use a randomly selected gameplay screenshot as the banner.
+          cp games/game5/assets/images/Cam8.png games/game5/banner.png
+
+          # Rename the browser page without changing the game's underlying files.
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("games/game5/index.html")
+          s = p.read_text(encoding="utf-8")
+          s = s.replace("<title>Five Nights At Epstein's</title>", "<title>Five Nights At Einsteins</title>")
+          p.write_text(s, encoding="utf-8")
+          PY
+
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("index.html")
+          s = p.read_text(encoding="utf-8")
+
+          old = '{ id:"four",  name:"retro bowl", cat:"arcade", art:"games/game4/retrobowl-banner.svg", href:"games/game4/" }'
+          new = old + ',\n  { id:"five",  name:"five nights at einsteins", cat:"arcade", art:"games/game5/banner.png", href:"games/game5/" }'
+          if old not in s:
+              raise SystemExit("Could not find the Retro Bowl entry to insert Game 5 after.")
+          s = s.replace(old, new, 1)
+
+          footer = "slope, papa's freezeria, subway surfers, and retro bowl are live."
+          new_footer = "slope, papa's freezeria, subway surfers, retro bowl, and five nights at einsteins are live."
+          s = s.replace(footer, new_footer, 1)
+
+          p.write_text(s, encoding="utf-8")
+          PY
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add games/game5 index.html
+          git commit -m "Add Five Nights at Einsteins as game 5"
+          git push
+
+          rm -f .github/workflows/import-fnae.yml
+          git add .github/workflows/import-fnae.yml
+          git commit -m "Remove temporary Five Nights at Einsteins import workflow"
+          git push
