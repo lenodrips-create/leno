@@ -1,0 +1,47 @@
+name: Import Five Nights at Einsteins locally
+
+on:
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    if: ${{ !contains(github.event.head_commit.message, 'Import Five Nights at Einsteins locally') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout site
+        uses: actions/checkout@v4
+
+      - name: Download game source
+        run: |
+          git clone --depth 1 https://github.com/n1yshi/Five-Nights-at-Epstein.git /tmp/fnae
+
+      - name: Copy game into site
+        run: |
+          rm -rf games/five-nights-at-einsteins games/five-nights-at-einsteins.html
+          mkdir -p games/five-nights-at-einsteins
+          rsync -a --exclude='.git' --exclude='.github' /tmp/fnae/ games/five-nights-at-einsteins/
+
+      - name: Update homepage to local game
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text()
+          old = 'art:"https://raw.githubusercontent.com/n1yshi/Five-Nights-at-Epstein/main/assets/images/Cam8.png", href:"games/five-nights-at-einsteins.html"'
+          new = 'art:"games/five-nights-at-einsteins/assets/images/Cam8.png", href:"games/five-nights-at-einsteins/"'
+          if old not in s:
+              raise SystemExit('Homepage Game 5 entry not found')
+          p.write_text(s.replace(old, new))
+          PY
+
+      - name: Commit local game
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add games/five-nights-at-einsteins index.html
+          git commit -m "Import Five Nights at Einsteins locally"
+          git push
