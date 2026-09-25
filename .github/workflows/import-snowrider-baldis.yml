@@ -12,6 +12,13 @@ jobs:
     if: \${{ github.event.head_commit.message != 'Import Snow Rider 3D and Baldis Basic game files' }}
     runs-on: ubuntu-latest
     steps:
+      - name: Skip if both games are already imported
+        run: |
+          if [ -f games/snowrider3d/index.html ] && [ -f games/baldisbasics/index.html ]; then
+            echo "games already imported"
+            exit 0
+          fi
+
       - name: Checkout
         uses: actions/checkout@v4
 
