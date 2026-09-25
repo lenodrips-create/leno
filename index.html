@@ -144,6 +144,7 @@ function placeholderArt(a, b){
 }
 
 const GAMES = [
+  { id:"request", name:"request a game", art:"games/request/banner.jpg", href:"https://docs.google.com/forms/d/e/1FAIpQLScw40AoF5-sUq5rspnKQktBGWedmJmRQNPYbB50016kkYZezg/viewform?usp=dialog", noCrop:true, blurFill:true, noStar:true },
   { id:"one",   name:"slope",      cat:"arcade",     art:"games/slope/banner.jpg", href:"games/slope/", noCrop:true, blurFill:true },
   { id:"two",   name:"papa's freezeria", cat:"simulation", art:"games/papasfreezeria/banner.jpg", href:"games/papasfreezeria/", noCrop:true, blurFill:true },
   { id:"three", name:"subway surfers", cat:"arcade", art:"games/game3/banner.jpg", href:"games/game3/", noCrop:true, blurFill:true },
@@ -186,8 +187,9 @@ function card(g){
     (g.blurFill ? '<img class="art-fill" src="' + g.art + '" alt="">' : '') +
     '<img class="art" src="' + g.art + '" alt="">' +
     '<span class="name">' + g.name + '</span>' +
-    '<button class="star" aria-pressed="' + on + '" aria-label="star ' + g.name + '">' +
-    (on ? "\u2605" : "\u2606") + '</button>';
+    (g.noStar ? '' : '<button class="star" aria-pressed="' + on + '" aria-label="star ' + g.name + '">' +
+    (on ? "\u2605" : "\u2606") + '</button>');
+  if (g.noStar) return el;
   el.querySelector(".star").addEventListener("click", e => {
     e.preventDefault(); e.stopPropagation();
     starred.has(g.id) ? starred.delete(g.id) : starred.add(g.id);
