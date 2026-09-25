@@ -1,0 +1,4 @@
+User-Agent: *
+Allow: /
+
+Sitemap: https://backroom-escape.vercel.app/sitemap.xml
