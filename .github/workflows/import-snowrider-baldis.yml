@@ -1,0 +1,42 @@
+name: Import Snow Rider 3D and Baldis Basic game files
+
+on:
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: write
+
+jobs:
+  import-games:
+    if: \${{ github.event.head_commit.message != 'Import Snow Rider 3D and Baldis Basic game files' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Import Snow Rider 3D
+        run: |
+          set -e
+          rm -rf /tmp/snowrider3d
+          git clone --depth 1 https://github.com/drippy-cat/snowrider3D.git /tmp/snowrider3d
+          mkdir -p games/snowrider3d
+          find games/snowrider3d -mindepth 1 ! -name 'banner.svg' -exec rm -rf {} +
+          rsync -a --exclude='.git' /tmp/snowrider3d/ games/snowrider3d/
+
+      - name: Import Baldis Basic
+        run: |
+          set -e
+          rm -rf /tmp/ugs-assets
+          git clone --depth 1 https://github.com/bubbls/UGS-Assets.git /tmp/ugs-assets
+          mkdir -p games/baldisbasics
+          find games/baldisbasics -mindepth 1 ! -name 'banner.svg' -exec rm -rf {} +
+          rsync -a /tmp/ugs-assets/baldis-basics/ games/baldisbasics/
+
+      - name: Commit imported game files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add games/snowrider3d games/baldisbasics
+          git commit -m "Import Snow Rider 3D and Baldis Basic game files"
+          git push
