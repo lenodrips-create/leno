@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <base href="https://cdn.jsdelivr.net/gh/Durvated/Jeweled@ae060ce259aebb0353a2ec33d36adaa62455bf5e/Games/Games/Popular/retrobowl/">
+  <title>Retro Bowl</title>
+  <style>
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: #316afc;
+    }
+    body {
+      display: grid;
+      place-items: center;
+      touch-action: none;
+    }
+    #gm4html5_div_id {
+      width: min(100vw, calc(100vh * 853 / 480));
+      height: min(100vh, calc(100vw * 480 / 853));
+      max-width: 100vw;
+      max-height: 100vh;
+      overflow: hidden;
+      background: #316afc;
+    }
+    #canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      image-rendering: pixelated;
+      image-rendering: optimizeSpeed;
+      touch-action: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="gm4html5_div_class" id="gm4html5_div_id">
+    <canvas id="canvas" width="853" height="480">
+      <p>Your browser doesn't support HTML5 canvas.</p>
+    </canvas>
+  </div>
+  <script src="html5game/RetroBowl.js"></script>
+  <script>
+    window.addEventListener("load", function () {
+      if (typeof GameMaker_Init === "function") GameMaker_Init();
+    });
+  </script>
+</body>
+</html>
