@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Subway Surfers</title>
+<style>
+:root{font-family:Arial,sans-serif;color:#fff;background:#050505}*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:linear-gradient(#111,#050505)}
+.wrap{width:min(920px,100%);padding:14px}.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+h1{font-size:22px;margin:0}.back{color:#fff;text-decoration:none;border:1px solid #555;border-radius:8px;padding:7px 10px}
+.game{position:relative;overflow:hidden;border:2px solid #555;border-radius:14px;background:#101010}
+canvas{display:block;width:100%;height:auto;touch-action:none}
+.hud{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;pointer-events:none;font-weight:700;text-shadow:0 2px 4px #000}
+.overlay{position:absolute;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.48)}
+.panel{text-align:center;background:rgba(0,0,0,.78);border:1px solid #666;border-radius:14px;padding:22px;max-width:340px}
+button{border:0;border-radius:9px;padding:10px 16px;font-weight:700;cursor:pointer;background:#fff;color:#000}
+.help{text-align:center;color:#aaa;font-size:13px;margin-top:9px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="top"><h1>Subway Surfers</h1><a class="back" href="../../index.html">back</a></div>
+<div class="game">
+<canvas id="c" width="900" height="520"></canvas>
+<div class="hud"><span id="score">score 0</span><span id="coins">coins 0</span></div>
+<div class="overlay" id="overlay"><div class="panel"><h2 id="msg">Subway Surfers</h2><p>Switch lanes, jump over barriers, and collect coins.</p><button id="start">play</button></div></div>
+</div>
+<div class="help">← → switch lanes · ↑ jump · swipe on mobile</div>
+</div>
+<script>
+const c=document.getElementById('c'),x=c.getContext('2d'),scoreEl=document.getElementById('score'),coinsEl=document.getElementById('coins'),overlay=document.getElementById('overlay'),msg=document.getElementById('msg'),start=document.getElementById('start');
+let running=false,score=0,coins=0,lane=1,target=1,jump=0,speed=6,objects=[],spawn=0,last=0;
+const lanes=[270,450,630],player={y:430,w:38,h:62};
+function reset(){score=0;coins=0;lane=target=1;jump=0;speed=6;objects=[];spawn=0;last=performance.now();running=true;overlay.style.display='none';requestAnimationFrame(loop)}
+function add(){objects.push({lane:Math.floor(Math.random()*3),y:-40,type:Math.random()<.45?'coin':'barrier',hit:false})}
+function draw(){
+x.clearRect(0,0,c.width,c.height);let g=x.createLinearGradient(0,0,0,c.height);g.addColorStop(0,'#161616');g.addColorStop(1,'#050505');x.fillStyle=g;x.fillRect(0,0,c.width,c.height);
+x.fillStyle='#222';x.beginPath();x.moveTo(210,0);x.lineTo(690,0);x.lineTo(850,520);x.lineTo(50,520);x.closePath();x.fill();
+x.strokeStyle='#555';x.lineWidth=5;[360,540].forEach(v=>{x.beginPath();x.moveTo(v,0);x.lineTo(450+(v-450)*1.9,520);x.stroke()});
+for(let y=40;y<520;y+=60){x.strokeStyle='#333';x.beginPath();x.moveTo(210+(y/520)*-160,y);x.lineTo(690+(y/520)*160,y);x.stroke()}
+objects.forEach(o=>{let px=lanes[o.lane];if(o.type==='coin'){x.fillStyle='#ffd34d';x.beginPath();x.arc(px,o.y,13,0,Math.PI*2);x.fill();x.fillStyle='#fff3a6';x.font='bold 12px Arial';x.textAlign='center';x.fillText('$',px,o.y+4)}else{x.fillStyle='#e33';x.fillRect(px-28,o.y,56,42);x.fillStyle='#ff9';x.fillRect(px-20,o.y+7,40,8)}});
+let py=player.y-Math.max(0,jump)*80;x.fillStyle='#36a9ff';x.fillRect(lanes[Math.round(lane)]-19,py-player.h,38,player.h);x.fillStyle='#f2c19b';x.beginPath();x.arc(lanes[Math.round(lane)],py-player.h-10,12,0,Math.PI*2);x.fill();
+}
+function loop(t){if(!running)return;let dt=Math.min(32,t-last);last=t;spawn-=dt;if(spawn<=0){add();spawn=Math.max(380,850-speed*45)}speed+=dt*.00015;lane+=(target-lane)*.22;
+objects.forEach(o=>o.y+=speed*dt/16);for(let i=objects.length-1;i>=0;i--){let o=objects[i],py=player.y-Math.max(0,jump)*80;if(o.y>520){objects.splice(i,1);score++;continue}if(!o.hit&&Math.abs(o.y-(py-25))<38&&o.lane===Math.round(lane)){o.hit=true;if(o.type==='coin'){coins++;o.y=700}else if(jump<.35){end();return}}}
+jump=Math.max(0,jump-dt/650);scoreEl.textContent='score '+score;coinsEl.textContent='coins '+coins;draw();requestAnimationFrame(loop)}
+function end(){running=false;msg.textContent='run over';start.textContent='play again';overlay.style.display='grid'}
+function move(d){target=Math.max(0,Math.min(2,target+d))}
+addEventListener('keydown',e=>{if(e.key==='ArrowLeft')move(-1);if(e.key==='ArrowRight')move(1);if(e.key==='ArrowUp'||e.code==='Space'){if(running)jump=1;else reset()}});
+let sx=0,sy=0;c.addEventListener('touchstart',e=>{let t=e.touches[0];sx=t.clientX;sy=t.clientY},{passive:true});
+c.addEventListener('touchend',e=>{let t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>25)move(dx>0?1:-1);else if(dy<-25&&running)jump=1},{passive:true});
+start.onclick=reset;draw();
+</script>
+</body>
+</html>
