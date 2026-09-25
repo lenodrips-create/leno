@@ -41,6 +41,8 @@
   .top nav a{color:var(--muted);text-decoration:none;font-size:13px;}
   .top nav a:hover,.top nav a:focus-visible{color:var(--text);}
 
+  .hero{display:block;width:100%;max-height:360px;object-fit:cover;border-radius:14px;margin:20px 0 0;}
+  .hero[hidden]{display:none;}
   .search{margin:20px auto 30px;max-width:320px;}
   .search input{
     width:100%;padding:11px 14px;border-radius:10px;
@@ -100,6 +102,9 @@
   <header class="top">
     <div class="brand">games</div>
   </header>
+
+  <video class="hero" src="top.webm" autoplay muted loop playsinline hidden
+         onloadeddata="this.hidden=false" onerror="this.remove()"></video>
 
   <div class="search">
     <input id="q" type="search" placeholder="search games" aria-label="search games">
