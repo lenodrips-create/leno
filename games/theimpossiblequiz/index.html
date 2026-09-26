@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Impossible Quiz</title>
+  <style>
+    html, body { margin: 0; height: 100%; overflow: hidden; background: #000; }
+    #ruffle { width: 100%; height: 100%; }
+  </style>
+  <script src="../ruffle/ruffle.js"></script>
+</head>
+<body>
+  <div id="ruffle"></div>
+  <script>
+    window.addEventListener("load", function () {
+      var player = window.RufflePlayer.newest().createPlayer();
+      player.style.width = "100%";
+      player.style.height = "100%";
+      document.getElementById("ruffle").appendChild(player);
+      (player.ruffle ? player.ruffle() : player).load("the-impossible-quiz.swf");
+    });
+  </script>
+</body>
+</html>
