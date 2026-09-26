@@ -3,258 +3,90 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>games</title>
+<title>edudeck</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#000000;
-    --panel:#101014;
-    --line:#2a2a33;
+    --blue:#2f6bb0;
+    --accent:#4ea1ff;
     --text:#ffffff;
-    --muted:#8b8f9c;
-    --accent:#4ade4a;
-    --star:#ffffff;
     color-scheme:dark;
-    box-sizing:border-box;
-    padding-top:env(safe-area-inset-top,0px);
-    padding-bottom:env(safe-area-inset-bottom,0px);
   }
   *,*::before,*::after{box-sizing:border-box;}
-  html,body,*,*::before,*::after{
-    cursor:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12'><rect x='.5' y='.5' width='11' height='11' fill='white' stroke='black'/></svg>") 6 6, auto !important;
-  }
-  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  html,body{margin:0;height:100%;}
   body{
-    margin:0;
-    background:var(--bg);
+    min-height:100%;
+    background:linear-gradient(160deg,#4b5361,#3a414d);
     color:var(--text);
     font-family:"Open Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-    font-size:15px;line-height:1.5;
-    text-transform:lowercase;
-    -webkit-font-smoothing:antialiased;
+    display:flex;flex-direction:column;align-items:center;
+    padding:0 20px;
   }
-  .wrap{max-width:1100px;margin:0 auto;padding:26px 18px 70px;}
-
-  .top{display:flex;flex-wrap:wrap;align-items:center;gap:14px;
-       padding-bottom:16px;border-bottom:1px solid var(--line);}
-  .brand{font-size:20px;font-weight:700;letter-spacing:-.02em;margin-right:auto;}
-  .top nav{display:flex;gap:16px;}
-  .top nav a{color:var(--muted);text-decoration:none;font-size:13px;}
-  .top nav a:hover,.top nav a:focus-visible{color:var(--text);}
-
-  .hero{display:block;width:100%;max-width:640px;aspect-ratio:16/9;object-fit:contain;background:#000;margin:20px auto 0;}
-  .hero[hidden]{display:none;}
-  .movies{margin-top:24px;}
-  .movies .grid{display:flex;justify-content:center;}
-  .movies .card{width:calc((100% - 36px) / 3);}
-  .search{margin:20px auto 30px;max-width:320px;}
-  .search input{
-    width:100%;padding:11px 14px;border-radius:10px;
-    border:1px solid var(--line);background:var(--panel);
-    color:var(--text);font:inherit;text-transform:lowercase;
-  }
-  .search input::placeholder{color:var(--muted);}
-  .search input:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
-
-
-  h2{font-size:14px;font-weight:600;color:var(--muted);margin:0 0 12px;}
-  section{margin-bottom:36px;}
-
-  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
-
-  /* banner card */
-  .card{
-    position:relative;display:block;text-decoration:none;color:inherit;
-    aspect-ratio:16/7;
-    border:3px solid #d5d7dd;border-radius:18px;
-    overflow:hidden;background:#000;
-    isolation:isolate;
-  }
-  .card:hover{border-color:#fff;}
-    .card:focus-visible{outline:3px solid var(--accent);outline-offset:3px;}
-  .art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-1;}  .card.no-crop .art{object-fit:contain;background:#000;}
-  .card.blur-fill .art{background:transparent;}
-  .art-fill{position:absolute;inset:-20px;width:calc(100% + 40px);height:calc(100% + 40px);object-fit:cover;filter:blur(14px) brightness(.55);z-index:-2;}
-  .name{
-    position:absolute;inset:0;display:grid;place-items:center;
-    font-size:clamp(20px,2.6vw,32px);font-weight:600;color:#fff;
-    text-shadow:0 2px 10px rgba(0,0,0,.85),0 0 3px rgba(0,0,0,.9);
-    padding:0 40px;text-align:center;
-  }
-  .star{
-    position:absolute;top:8px;right:12px;
-    background:none;border:0;padding:2px;cursor:pointer;
-    color:var(--star);font-size:26px;line-height:1;
-    text-shadow:0 1px 6px rgba(0,0,0,.9);
-  }
-  .star[aria-pressed="true"]{color:#ffd84a;}
-  .star:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:5px;}
-
-  .empty{color:var(--muted);font-size:13px;border:1px dashed var(--line);
-         border-radius:14px;padding:22px;text-align:center;}
-  @media (max-width:760px){.grid{grid-template-columns:repeat(2,1fr);}
-    .movies .card{width:calc((100% - 18px) / 2);}
-    .name{font-size:clamp(20px,4vw,30px);}}
-  @media (max-width:480px){.grid{grid-template-columns:1fr;}
-    .movies .card{width:100%;}
-    .card{aspect-ratio:16/5;}
-    .name{font-size:32px;}}
-  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
+  .wrap{width:100%;max-width:760px;margin:0 auto;padding:64px 0 40px;text-align:center;}
+  .logo{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:52px;}
+  .logo .mark{width:54px;height:54px;border-radius:13px;
+    background:linear-gradient(150deg,#4ea1ff,#2f6bb0);
+    display:grid;place-items:center;color:#fff;font-weight:700;font-size:28px;
+    box-shadow:0 4px 14px rgba(0,0,0,.25);}
+  .logo .name{font-size:40px;font-weight:700;letter-spacing:-.02em;}
+  .logo .name b{color:#7fbcff;font-weight:700;}
+  form{display:flex;flex-direction:column;gap:20px;}
+  .field{display:none;}
+  .field.show{display:block;}
+  .field input{width:100%;padding:16px 18px;border-radius:8px;border:none;font:inherit;font-size:17px;color:#1b2027;}
+  button{width:100%;padding:20px;border-radius:8px;font:inherit;font-size:20px;font-weight:600;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;transition:filter .15s ease;}
+  button:hover{filter:brightness(1.08);}
+  .b-primary{background:var(--blue);color:#fff;border:none;}
+  .b-white{background:#fff;color:#2f6bb0;border:none;}
+  .b-outline{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.55);}
+  .foot{margin-top:60px;display:flex;flex-direction:column;gap:24px;}
+  .foot a{color:#dfe4ea;text-decoration:underline;font-size:16px;cursor:pointer;}
+  .icon{font-size:20px;line-height:1;}
 </style>
 </head>
 <body>
-<div class="wrap">
+  <div class="wrap">
+    <div class="logo">
+      <div class="mark">E</div>
+      <div class="name">edu<b>deck</b></div>
+    </div>
 
-  <header class="top">
-    <div class="brand">games</div>
-  </header>
+    <form id="gate">
+      <button type="button" class="b-primary" onclick="go()">
+        <span class="icon">📚</span> enter edudeck
+      </button>
+      <button type="button" class="b-white" onclick="ask()">
+        <span class="icon">🧑‍🎓</span> sign in with a name
+      </button>
+      <button type="button" class="b-outline" onclick="go()">
+        <span class="icon">▦</span> continue as guest
+      </button>
 
-  <video class="hero" autoplay muted loop playsinline hidden onloadeddata="this.hidden=false">
-    <source src="top.mp4" type="video/mp4">
-    <source src="top.webm" type="video/webm" onerror="this.parentNode.remove()">
-  </video>
+      <div class="field" id="namefield">
+        <input id="name" placeholder="type any name" autocomplete="off"
+               onkeydown="if(event.key==='Enter'){event.preventDefault();go();}">
+      </div>
+    </form>
 
-  <section class="movies">
-    <div class="grid" id="movies"></div>
-  </section>
-
-  <div class="search">
-    <input id="q" type="search" placeholder="search games" aria-label="search games">
+    <div class="foot">
+      <a onclick="go()">new here? just jump in.</a>
+      <a onclick="go()">need help getting started?</a>
+    </div>
   </div>
 
-  <section id="starred-section" hidden>
-    <div class="grid" id="starred"></div>
-  </section>
-
-  <section>
-    <h2>all games</h2><!-- fnae-live -->
-    <div class="grid" id="all"></div>
-    <p class="empty" id="all-empty" hidden>no games match that search.</p>
-  </section>
-
-</div>
-
-<script>
-/* placeholder artwork: swap `art` for an image path when you have one */
-function placeholderArt(a, b){
-  const svg =
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 100" preserveAspectRatio="none">' +
-      '<defs>' +
-        '<linearGradient id="g" x1="0" y1="0" x2="1" y2="1">' +
-          '<stop offset="0" stop-color="' + a + '"/><stop offset="1" stop-color="' + b + '"/>' +
-        '</linearGradient>' +
-        '<pattern id="p" width="20" height="20" patternUnits="userSpaceOnUse">' +
-          '<path d="M20 0H0V20" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="1"/>' +
-        '</pattern>' +
-      '</defs>' +
-      '<rect width="320" height="100" fill="url(#g)"/>' +
-      '<rect width="320" height="100" fill="url(#p)"/>' +
-    '</svg>';
-  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
-}
-
-const GAMES = [
-  { id:"request", name:"request a game", art:"games/request/banner.jpg", href:"https://docs.google.com/forms/d/e/1FAIpQLScw40AoF5-sUq5rspnKQktBGWedmJmRQNPYbB50016kkYZezg/viewform?usp=dialog", noCrop:true, blurFill:true, noStar:true },
-  { id:"granny", name:"granny", cat:"arcade", art:"games/granny/banner.jpg", href:"games/granny/", noCrop:true, blurFill:true },
-  { id:"gtasimulator", name:"gta simulator", cat:"arcade", art:"games/gta-simulator/banner.jpg", href:"games/gta-simulator/", noCrop:true, blurFill:true },
-  { id:"fortzone", name:"fortzone battle royale", cat:"arcade", art:"games/fortzone/banner.jpg", href:"games/fortzone/", noCrop:true, blurFill:true },
-  { id:"blockblast", name:"block blast", cat:"arcade", art:"games/blockblast/banner.jpg", href:"games/blockblast/", noCrop:true, blurFill:true },
-  { id:"one",   name:"slope",      cat:"arcade",     art:"games/slope/banner.jpg", href:"games/slope/", noCrop:true, blurFill:true },
-  { id:"two",   name:"papa's freezeria", cat:"simulation", art:"games/papasfreezeria/banner.jpg", href:"games/papasfreezeria/", noCrop:true, blurFill:true },
-  { id:"survivalrace", name:"survival race", cat:"arcade", art:"games/survival-race/banner.jpg", href:"games/survival-race/", noCrop:true, blurFill:true },
-  { id:"three", name:"subway surfers", cat:"arcade", art:"games/game3/banner.jpg", href:"games/game3/", noCrop:true, blurFill:true },
-  { id:"four",  name:"retro bowl", cat:"arcade", art:"games/game4/banner.jpg", href:"games/game4/?v=2", noCrop:true, blurFill:true },
-  { id:"clusterrush", name:"cluster rush", cat:"arcade", art:"games/clusterrush/banner.jpg", href:"games/clusterrush/", noCrop:true, blurFill:true },
-  { id:"stealabrainrot", name:"steal a brainrot", cat:"arcade", art:"games/steal-a-brainrot/banner.webp", href:"games/steal-a-brainrot/", noCrop:true, blurFill:true },
-  { id:"onlyup", name:"only up", cat:"arcade", art:"games/only-up/banner.png", href:"games/only-up/", noCrop:true, blurFill:true },
-  { id:"five",  name:"five nights at einsteins", cat:"arcade", art:"games/five-nights-at-einsteins/banner.jpg", href:"games/five-nights-at-einsteins/", noCrop:true, blurFill:true },
-  { id:"six",   name:"aquapark.io", cat:"arcade", art:"games/aquapark-io/banner.jpg?v=2", href:"games/aquapark-io/", noCrop:true, blurFill:true },
-  { id:"seven", name:"snow rider 3d", cat:"arcade", art:"games/snowrider3d/banner.jpg", href:"games/snowrider3d/", noCrop:true, blurFill:true },
-  { id:"eight", name:"baldis basic", cat:"arcade", art:"games/baldisbasics/banner.jpg", href:"games/baldisbasics/", noCrop:true, blurFill:true },
-  { id:"nine",  name:"soflo wheelie life", cat:"arcade", art:"games/soflowheelielife/banner.jpg", href:"games/soflowheelielife/", noCrop:true, blurFill:true },
-  { id:"ten",   name:"backrooms escape", cat:"arcade", art:"games/backrooms-escape/banner.jpg", href:"games/backrooms-escape/", noCrop:true, blurFill:true },
-  { id:"eleven", name:"cuphead", cat:"arcade", art:"games/cupped/banner.jpg", href:"games/cupped/", noCrop:true, blurFill:true },
-  { id:"twelve", name:"minecraft 1.5.2", cat:"arcade", art:"games/minecraft/banner.jpg", href:"games/minecraft/", noCrop:true, blurFill:true },
-  { id:"thirteen", name:"rocket soccer", cat:"arcade", art:"games/rocket-soccer/banner.jpg", href:"games/rocket-soccer/", noCrop:true, blurFill:true },
-  { id:"fourteen", name:"super mario 64", cat:"arcade", art:"games/supermario64/banner.jpg", href:"games/supermario64/", noCrop:true, blurFill:true },
-  { id:"fifteen", name:"basketball stars", cat:"arcade", art:"games/basketball-stars/banner.jpg", href:"games/basketball-stars/", noCrop:true, blurFill:true },
-  { id:"sixteen", name:"among us", cat:"arcade", art:"games/amongus/banner.jpg", href:"games/amongus/", noCrop:true, blurFill:true },
-  { id:"seventeen", name:"1v1.lol", cat:"arcade", art:"games/1v1lol/banner.jpg", href:"games/1v1lol/", noCrop:true, blurFill:true },
-  { id:"eighteen", name:"donkey kong", cat:"arcade", art:"games/donkeykong/banner.jpg", href:"games/donkeykong/", noCrop:true, blurFill:true },
-  { id:"nineteen", name:"super hot", cat:"arcade", art:"games/superhot/banner.jpg", href:"games/superhot/", noCrop:true, blurFill:true },
-  { id:"twenty", name:"temple run 2", cat:"arcade", art:"games/templerun2/banner.jpg", href:"games/templerun2/", noCrop:true, blurFill:true },
-  { id:"twentyone", name:"geometry dash", cat:"arcade", art:"games/geometrydash/banner.jpg", href:"games/geometrydash/", noCrop:true, blurFill:true },
-  { id:"twentytwo", name:"drift boss", cat:"arcade", art:"games/drift-boss/banner.jpg", href:"games/drift-boss/", noCrop:true, blurFill:true },
-  { id:"twentythree", name:"red ball 4", cat:"arcade", art:"games/redball4/banner.jpg", href:"games/redball4/", noCrop:true, blurFill:true },
-  { id:"twentyfour", name:"papa's burgeria", cat:"arcade", art:"games/papasburgeria/banner.jpg", href:"games/papasburgeria/", noCrop:true, blurFill:true },
-  { id:"papasbakeria", name:"papa's bakeria", cat:"arcade", art:"games/papasbakeria/banner.jpg", href:"games/papasbakeria/", noCrop:true, blurFill:true },
-  { id:"papassushiria", name:"papa's sushiria", cat:"arcade", art:"games/papassushiria/banner.jpg", href:"games/papassushiria/", noCrop:true, blurFill:true },
-  { id:"papaspizzeria", name:"papa's pizzeria", cat:"arcade", art:"games/papaspizzaria/banner.jpg", href:"games/papaspizzaria/", noCrop:true, blurFill:true },
-  { id:"twentyfive", name:"moto x3m", cat:"arcade", art:"games/motox3m/banner.jpg", href:"games/motox3m/", noCrop:true, blurFill:true },
-  { id:"twentysix", name:"mario kart 64", cat:"arcade", art:"games/mariokart64/banner.jpg", href:"games/mariokart64/", noCrop:true, blurFill:true },
-  { id:"sliceitall", name:"slice it all", cat:"arcade", art:"games/slice-it-all/banner.jpg", href:"games/slice-it-all/", noCrop:true, blurFill:true },
-  { id:"magictiles3", name:"magic tiles 3", cat:"arcade", art:"games/magic-tiles-3/banner.jpg", href:"games/magic-tiles-3/", noCrop:true, blurFill:true },
-  { id:"crazycattle3d", name:"crazy cattle 3d", cat:"arcade", art:"games/crazy-cattle-3d/banner.jpg", href:"games/crazy-cattle-3d/", noCrop:true, blurFill:true },
-  { id:"skibidi1v100", name:"skibidi toilet 1v100", cat:"arcade", art:"games/skibidi1v100/banner.jpg", href:"games/skibidi1v100/", noCrop:true, blurFill:true },
-  { id:"stack", name:"stack", cat:"arcade", art:"games/stack/banner.jpg", href:"games/stack/", noCrop:true, blurFill:true },
-  { id:"spiralroll", name:"spiral roll", cat:"arcade", art:"games/spiral-roll/banner.png", href:"games/spiral-roll/", noCrop:true, blurFill:true },
-  { id:"holeio", name:"hole.io", cat:"arcade", art:"games/hole-io/banner.jpg", href:"games/hole-io/", noCrop:true, blurFill:true },
-  { id:"slitherio", name:"slither.io", cat:"arcade", art:"games/slither-io/banner.png", href:"games/slither-io/", noCrop:true, blurFill:true },
-  { id:"bindingofisaac", name:"the binding of isaac", cat:"arcade", art:"games/thebindingofisaac/banner.jpg", href:"games/thebindingofisaac/", noCrop:true, blurFill:true },
-  { id:"impossiblequiz", name:"the impossible quiz", cat:"arcade", art:"games/theimpossiblequiz/banner.jpg", href:"games/theimpossiblequiz/", noCrop:true, blurFill:true }
-];
-
-let starred = new Set();
-try { starred = new Set(JSON.parse(localStorage.getItem("starred") || "[]")); } catch (e) {}
-function save(){ try { localStorage.setItem("starred", JSON.stringify([...starred])); } catch (e) {} }
-
-let query = "";
-
-function card(g){
-  const on = starred.has(g.id);
-  const el = document.createElement("a");
-  el.className = "card" + (g.wide ? " wide-banner" : "") + (g.noCrop ? " no-crop" : "") + (g.blurFill ? " blur-fill" : "");
-  el.href = g.href || "#";
-  if (g.href) { el.target = "_blank"; el.rel = "noopener"; }
-  el.innerHTML =
-    (g.blurFill ? '<img class="art-fill" src="' + g.art + '" alt="">' : '') +
-    '<img class="art" src="' + g.art + '" alt="">' +
-    '<span class="name">' + g.name + '</span>' +
-    (g.noStar ? '' : '<button class="star" aria-pressed="' + on + '" aria-label="star ' + g.name + '">' +
-    (on ? "\u2605" : "\u2606") + '</button>');
-  if (g.noStar) return el;
-  el.querySelector(".star").addEventListener("click", e => {
-    e.preventDefault(); e.stopPropagation();
-    starred.has(g.id) ? starred.delete(g.id) : starred.add(g.id);
-    save(); render();
-  });
-  return el;
-}
-
-document.getElementById("movies").appendChild(card({ id:"movies", name:"movies", art:"movies/banner.jpg", href:"movies/", noCrop:true, blurFill:true, noStar:true }));
-
-function render(){
-  const all = document.getElementById("all");
-  const star = document.getElementById("starred");
-  all.innerHTML = ""; star.innerHTML = "";
-
-  const shown = GAMES.filter(g => g.name.includes(query));
-  shown.forEach(g => all.appendChild(card(g)));
-  document.getElementById("all-empty").hidden = shown.length > 0;
-
-  const fav = GAMES.filter(g => starred.has(g.id));
-  fav.forEach(g => star.appendChild(card(g)));
-  document.getElementById("starred-section").hidden = fav.length === 0;
-}
-
-document.getElementById("q").addEventListener("input", e => {
-  query = e.target.value.trim().toLowerCase();
-  render();
-});
-
-render();
-</script>
+  <script>
+    function ask(){
+      var f=document.getElementById('namefield');
+      f.classList.add('show');
+      document.getElementById('name').focus();
+    }
+    function go(){
+      // any name is accepted and ignored; nothing is stored or sent
+      window.location.href = "home.html";
+    }
+  </script>
 </body>
 </html>
