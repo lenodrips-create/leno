@@ -106,7 +106,11 @@
       ? base + "order:-1;margin-right:6px;"
       : base + "position:fixed;top:12px;left:12px;z-index:9000;box-shadow:0 4px 14px rgba(0,0,0,.4);";
     pill.innerHTML = '<span style="width:9px;height:9px;border-radius:50%;background:#4ade4a;' +
-      'box-shadow:0 0 8px #4ade4a"></span><span id="ed-count">0 online</span>';
+      'box-shadow:0 0 8px #4ade4a;flex:none"></span><span id="ed-count" style="flex:none">0 online</span>' +
+      '<span id="ed-inline" style="color:#8b8f9c;font-weight:400;white-space:nowrap;overflow:hidden;' +
+      'text-overflow:ellipsis;max-width:min(60vw,620px)"></span>';
+    // let the pill grow to fit the inline list
+    pill.style.cssText += "max-width:calc(100vw - 24px);overflow:hidden;";
 
     panel = document.createElement("div");
     panel.style.cssText = "position:fixed;top:60px;left:12px;z-index:9000;width:min(280px,86vw);" +
@@ -139,8 +143,17 @@
     }
     rows.sort(function (a, b) { return (a.name || "").localeCompare(b.name || ""); });
 
-    document.getElementById("ed-count").textContent =
-      rows.length + (rows.length === 1 ? " online" : " online");
+    document.getElementById("ed-count").textContent = rows.length + " online";
+
+    // inline list beside the count: "leno (slope) · sam (browsing) · ..."
+    var inline = document.getElementById("ed-inline");
+    if (inline) {
+      inline.textContent = rows.length
+        ? "— " + rows.map(function (u) {
+            return u.name + " (" + (u.game ? u.game : "browsing") + ")";
+          }).join(" · ")
+        : "";
+    }
 
     if (!rows.length) {
       panel.innerHTML = '<div style="padding:10px;color:#8b8f9c">nobody online right now</div>';
