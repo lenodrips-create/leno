@@ -55,50 +55,6 @@ education-website/
 └── LICENSE
 ```
 
-## 🚀 Getting Started
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/your-username/education-website.git
-```
-
-### 2. Navigate to the project
-
-```bash
-cd education-website
-```
-
-### 3. Install dependencies
-
-```bash
-npm install
-```
-
-### 4. Start the development server
-
-```bash
-npm run dev
-```
-
-The website should now be available at:
-
-```text
-http://localhost:3000
-```
-
-## ⚙️ Environment Variables
-
-If your project uses environment variables, create a `.env` file in the root directory:
-
-```env
-DATABASE_URL=your_database_url
-API_KEY=your_api_key
-AUTH_SECRET=your_auth_secret
-```
-
-Do not commit sensitive credentials or `.env` files to the repository.
-
 ## 🖥️ Main Pages
 
 | Page           | Description                                   |
