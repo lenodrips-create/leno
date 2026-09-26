@@ -25,6 +25,34 @@
   }
   function saveName(n) { try { localStorage.setItem("edudeck_name", n); } catch (e) {} }
 
+  // ---- name filter ---------------------------------------------------------
+  // Fold common leet substitutions and strip non-letters so "n1_gg3r" etc. are
+  // still caught, then block any name containing a listed word.
+  var BANNED = [
+    // slurs
+    "nigger", "nigga", "faggot", "faggit", "fag", "retard", "chink", "spic",
+    "kike", "wetback", "coon", "tranny", "dyke", "beaner", "gook", "paki",
+    // requested words
+    "jew", "jews", "gay", "dress", "dresses",
+    // general profanity
+    "fuck", "shit", "bitch", "cunt", "pussy", "dick", "cock", "penis",
+    "vagina", "porn", "sex", "rape", "nazi", "hitler"
+  ];
+  function normName(s) {
+    return String(s).toLowerCase()
+      .replace(/0/g, "o").replace(/1/g, "i").replace(/3/g, "e").replace(/4/g, "a")
+      .replace(/5/g, "s").replace(/7/g, "t").replace(/8/g, "b").replace(/@/g, "a")
+      .replace(/\$/g, "s").replace(/[^a-z]/g, "");
+  }
+  function isBanned(name) {
+    var n = normName(name);
+    if (!n) return false;
+    for (var i = 0; i < BANNED.length; i++) {
+      if (n.indexOf(BANNED[i]) !== -1) return true;
+    }
+    return false;
+  }
+
   function askName(cb) {
     var wrap = document.createElement("div");
     wrap.style.cssText = "position:fixed;inset:0;z-index:9999;display:flex;align-items:center;" +
@@ -36,16 +64,25 @@
       '<div style="font-size:13px;color:#8b8f9c;margin-bottom:16px">shows you on the online list</div>' +
       '<input id="ed-name" placeholder="type any name" autocomplete="off" maxlength="24" ' +
       'style="width:100%;padding:12px 14px;border-radius:9px;border:1px solid #2a2a33;background:#000;' +
-      'color:#fff;font:inherit;text-align:center;margin-bottom:14px">' +
+      'color:#fff;font:inherit;text-align:center;margin-bottom:8px">' +
+      '<div id="ed-err" style="display:none;color:#ff6161;font-size:13px;margin-bottom:10px">' +
+      'that name isn’t allowed — pick another</div>' +
       '<button id="ed-go" style="width:100%;padding:12px;border-radius:9px;border:none;cursor:pointer;' +
-      'background:#4ade4a;color:#06210a;font:inherit;font-weight:700;font-size:16px">let’s go</button>' +
+      'background:#4ade4a;color:#06210a;font:inherit;font-weight:700;font-size:16px;margin-top:6px">let’s go</button>' +
       '</div>';
     document.body.appendChild(wrap);
     var input = wrap.querySelector("#ed-name");
     var go = wrap.querySelector("#ed-go");
+    var err = wrap.querySelector("#ed-err");
     input.focus();
     function done() {
       var n = (input.value || "").trim() || "guest";
+      if (isBanned(n)) {          // reject and let them try again
+        err.style.display = "block";
+        input.value = "";
+        input.focus();
+        return;
+      }
       document.body.removeChild(wrap);
       saveName(n);
       cb(n);
@@ -197,7 +234,7 @@
     setStatus("…");
     hookGameClicks();
     var n = storedName();
-    if (n) { myName = n; connect(); }
+    if (n && !isBanned(n)) { myName = n; connect(); }   // re-prompt if a banned name was stored
     else askName(function (name) { myName = name; connect(); });
   }
   if (document.readyState === "loading") {

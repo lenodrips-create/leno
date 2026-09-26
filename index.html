@@ -78,16 +78,31 @@
   </div>
 
   <script>
+    // block slurs / banned words as names (mirrors presence.js)
+    var BANNED = ["nigger","nigga","faggot","faggit","fag","retard","chink","spic",
+      "kike","wetback","coon","tranny","dyke","beaner","gook","paki",
+      "jew","jews","gay","dress","dresses",
+      "fuck","shit","bitch","cunt","pussy","dick","cock","penis","vagina",
+      "porn","sex","rape","nazi","hitler"];
+    function nameBanned(s){
+      var n=String(s).toLowerCase()
+        .replace(/0/g,"o").replace(/1/g,"i").replace(/3/g,"e").replace(/4/g,"a")
+        .replace(/5/g,"s").replace(/7/g,"t").replace(/8/g,"b").replace(/@/g,"a")
+        .replace(/\$/g,"s").replace(/[^a-z]/g,"");
+      if(!n) return false;
+      for(var i=0;i<BANNED.length;i++){ if(n.indexOf(BANNED[i])!==-1) return true; }
+      return false;
+    }
     function ask(){
       var f=document.getElementById('namefield');
       f.classList.add('show');
       document.getElementById('name').focus();
     }
     function go(){
-      // if they typed a name, remember it so the games page doesn't re-ask
+      // if they typed an allowed name, remember it so the games page doesn't re-ask
       var el = document.getElementById('name');
       var n = el && el.value ? el.value.trim() : "";
-      if (n) { try { localStorage.setItem("edudeck_name", n); } catch(e){} }
+      if (n && !nameBanned(n)) { try { localStorage.setItem("edudeck_name", n); } catch(e){} }
       window.location.href = "home.html";
     }
   </script>
