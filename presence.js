@@ -1,6 +1,7 @@
 /* EduDeck presence: shared "active users" list via Firebase Realtime Database.
    Stores { name, game, ts } per session under /presence/<id>, auto-removed on
-   disconnect. Any name is accepted; nothing else about the visitor is collected. */
+   disconnect. Any name is accepted; nothing else about the visitor is collected.
+   The widget always renders (even if Firebase is blocked) and shows its status. */
 (function () {
   var firebaseConfig = {
     apiKey: "AIzaSyBpagmgKx238oygQbi6RL1t7L0I2Apg5Hs",
@@ -15,11 +16,8 @@
   var ACTIVE_MS = 45000;   // treat someone as online if seen in the last 45s
   var BEAT_MS = 15000;     // how often we say "still here"
 
-  if (!window.firebase || !firebase.database) return;
-  firebase.initializeApp(firebaseConfig);
-  var db = firebase.database();
-
-  var meId, meRef, myName = "", myGame = null;
+  var db = null, meId, meRef, myName = "", myGame = null;
+  var connected = false;
 
   // ---- name ----------------------------------------------------------------
   function storedName() {
@@ -56,29 +54,48 @@
     input.addEventListener("keydown", function (e) { if (e.key === "Enter") done(); });
   }
 
-  // ---- presence ------------------------------------------------------------
-  function start(name) {
-    myName = name;
+  // ---- firebase ------------------------------------------------------------
+  function connect() {
+    if (!window.firebase || !firebase.database) {
+      setStatus("offline — can’t reach the server");
+      console.warn("[presence] Firebase library did not load (network/filter blocked gstatic.com).");
+      return;
+    }
+    try {
+      if (!firebase.apps || !firebase.apps.length) firebase.initializeApp(firebaseConfig);
+      db = firebase.database();
+    } catch (e) {
+      setStatus("offline — setup error");
+      console.error("[presence] init failed:", e);
+      return;
+    }
+
     meId = Math.random().toString(36).slice(2) + Date.now().toString(36);
     meRef = db.ref("presence/" + meId);
     meRef.onDisconnect().remove();
+
+    db.ref(".info/connected").on("value", function (s) {
+      connected = !!(s && s.val());
+      if (connected) { write(); } else { setStatus("connecting…"); }
+    });
+
     write();
     setInterval(write, BEAT_MS);
     window.addEventListener("beforeunload", function () { try { meRef.remove(); } catch (e) {} });
 
-    hookGameClicks();
-    listen();
+    db.ref("presence").on("value", function (snap) { render(snap.val() || {}); },
+      function (err) {
+        setStatus("offline — database blocked this read");
+        console.error("[presence] read denied — check Realtime Database rules:", err);
+      });
   }
 
   function write() {
     if (!meRef) return;
-    meRef.set({ name: myName, game: myGame, ts: Date.now() });
+    try { meRef.set({ name: myName, game: myGame, ts: Date.now() }); } catch (e) {}
   }
-
   function setGame(g) { myGame = g || null; write(); }
 
-  // Cards open in a new tab and this page stays open, so a click tells us what
-  // they launched. "request a game" and "movies" are ignored.
   function hookGameClicks() {
     document.addEventListener("click", function (e) {
       var card = e.target.closest ? e.target.closest(".card") : null;
@@ -92,25 +109,23 @@
   }
 
   // ---- widget --------------------------------------------------------------
-  var pill, panel, open = false;
+  var panel, open = false;
   function buildWidget() {
     var header = document.querySelector(".top");
-    pill = document.createElement("button");
+    var pill = document.createElement("button");
     pill.id = "ed-presence-pill";
     pill.type = "button";
     var base = "display:inline-flex;align-items:center;gap:8px;padding:8px 13px;border-radius:999px;" +
       "border:1px solid #2a2a33;background:#101014;color:#fff;font:inherit;font-size:13px;" +
       "font-weight:600;cursor:pointer;";
-    // In the header, sit inline at the far left; otherwise pin to the corner.
     pill.style.cssText = header
-      ? base + "order:-1;margin-right:6px;"
-      : base + "position:fixed;top:12px;left:12px;z-index:9000;box-shadow:0 4px 14px rgba(0,0,0,.4);";
+      ? base + "order:-1;margin-right:6px;max-width:calc(100vw - 24px);overflow:hidden;"
+      : base + "position:fixed;top:12px;left:12px;z-index:9000;box-shadow:0 4px 14px rgba(0,0,0,.4);" +
+        "max-width:calc(100vw - 24px);overflow:hidden;";
     pill.innerHTML = '<span style="width:9px;height:9px;border-radius:50%;background:#4ade4a;' +
-      'box-shadow:0 0 8px #4ade4a;flex:none"></span><span id="ed-count" style="flex:none">0 online</span>' +
+      'box-shadow:0 0 8px #4ade4a;flex:none"></span><span id="ed-count" style="flex:none">…</span>' +
       '<span id="ed-inline" style="color:#8b8f9c;font-weight:400;white-space:nowrap;overflow:hidden;' +
-      'text-overflow:ellipsis;max-width:min(60vw,620px)"></span>';
-    // let the pill grow to fit the inline list
-    pill.style.cssText += "max-width:calc(100vw - 24px);overflow:hidden;";
+      'text-overflow:ellipsis"></span>';
 
     panel = document.createElement("div");
     panel.style.cssText = "position:fixed;top:60px;left:12px;z-index:9000;width:min(280px,86vw);" +
@@ -124,6 +139,13 @@
     if (header) header.insertBefore(pill, header.firstChild);
     else document.body.appendChild(pill);
     document.body.appendChild(panel);
+  }
+
+  function setStatus(text) {
+    var c = document.getElementById("ed-count");
+    if (c) c.textContent = text;
+    var inline = document.getElementById("ed-inline");
+    if (inline) inline.textContent = "";
   }
 
   function esc(s) {
@@ -145,7 +167,6 @@
 
     document.getElementById("ed-count").textContent = rows.length + " online";
 
-    // inline list beside the count: "leno (slope) · sam (browsing) · ..."
     var inline = document.getElementById("ed-inline");
     if (inline) {
       inline.textContent = rows.length
@@ -162,9 +183,7 @@
     var html = "";
     for (var i = 0; i < rows.length; i++) {
       var mine = rows[i].name === myName;
-      var status = rows[i].game
-        ? ("playing " + esc(rows[i].game))
-        : "browsing";
+      var status = rows[i].game ? ("playing " + esc(rows[i].game)) : "browsing";
       html +=
         '<div style="display:flex;align-items:center;gap:9px;padding:8px 9px;border-radius:8px;' +
         (mine ? "background:#16321a;" : "") + '">' +
@@ -176,15 +195,14 @@
     panel.innerHTML = html;
   }
 
-  function listen() {
-    db.ref("presence").on("value", function (snap) { render(snap.val() || {}); });
-  }
-
   // ---- boot ----------------------------------------------------------------
   function boot() {
-    buildWidget();
+    buildWidget();               // widget always appears
+    setStatus("…");
+    hookGameClicks();
     var n = storedName();
-    if (n) start(n); else askName(start);
+    if (n) { myName = n; connect(); }
+    else askName(function (name) { myName = name; connect(); });
   }
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", boot);
