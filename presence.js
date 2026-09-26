@@ -32,6 +32,10 @@
     // slurs
     "nigger", "nigga", "faggot", "faggit", "fag", "retard", "chink", "spic",
     "kike", "wetback", "coon", "tranny", "dyke", "beaner", "gook", "paki",
+    "goy", "goyim", "heeb", "yid", "shylock", "kkk", "negro", "jigaboo",
+    "spook", "darkie", "sambo", "raghead", "towelhead", "sandnigger",
+    "zipperhead", "wop", "dago", "kraut", "jap", "homo", "groid",
+    "porchmonkey", "mongoloid", "gyp", "redskin", "savage",
     // requested words
     "jew", "jews", "gay", "dress", "dresses",
     // general profanity
@@ -211,7 +215,10 @@
     for (var k in all) {
       if (!all.hasOwnProperty(k)) continue;
       var u = all[k];
-      if (!u || !u.ts || now - u.ts > ACTIVE_MS) continue;
+      if (!u) continue;
+      // purge anyone who slipped in with a banned name
+      if (isBanned(u.name)) { try { if (db) db.ref("presence/" + k).remove(); } catch (e) {} continue; }
+      if (!u.ts || now - u.ts > ACTIVE_MS) continue;
       rows.push(u);
     }
     rows.sort(function (a, b) {
