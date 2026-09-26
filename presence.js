@@ -44,13 +44,22 @@
       .replace(/5/g, "s").replace(/7/g, "t").replace(/8/g, "b").replace(/@/g, "a")
       .replace(/\$/g, "s").replace(/[^a-z]/g, "");
   }
+  // Looks like a real street address / postal code (block for privacy).
+  var STREET = /\b(st|street|ave|avenue|rd|road|ln|lane|dr|drive|blvd|boulevard|ct|court|cir|circle|way|place|pl|hwy|highway|terrace|ter|apt|suite|ste)\b/;
+  function looksLikeAddress(name) {
+    var s = String(name).toLowerCase();
+    if (/\d{5}/.test(s)) return true;                 // zip code
+    if (/\d/.test(s) && STREET.test(s)) return true;  // number + street word
+    return false;
+  }
   function isBanned(name) {
     var n = normName(name);
-    if (!n) return false;
-    for (var i = 0; i < BANNED.length; i++) {
-      if (n.indexOf(BANNED[i]) !== -1) return true;
+    if (n) {
+      for (var i = 0; i < BANNED.length; i++) {
+        if (n.indexOf(BANNED[i]) !== -1) return true;
+      }
     }
-    return false;
+    return looksLikeAddress(name);
   }
 
   function askName(cb) {

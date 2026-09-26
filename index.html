@@ -84,14 +84,20 @@
       "jew","jews","gay","dress","dresses",
       "fuck","shit","bitch","cunt","pussy","dick","cock","penis","vagina",
       "porn","sex","rape","nazi","hitler"];
+    var STREET=/\b(st|street|ave|avenue|rd|road|ln|lane|dr|drive|blvd|boulevard|ct|court|cir|circle|way|place|pl|hwy|highway|terrace|ter|apt|suite|ste)\b/;
+    function looksLikeAddress(s){
+      s=String(s).toLowerCase();
+      if(/\d{5}/.test(s)) return true;
+      if(/\d/.test(s)&&STREET.test(s)) return true;
+      return false;
+    }
     function nameBanned(s){
       var n=String(s).toLowerCase()
         .replace(/0/g,"o").replace(/1/g,"i").replace(/3/g,"e").replace(/4/g,"a")
         .replace(/5/g,"s").replace(/7/g,"t").replace(/8/g,"b").replace(/@/g,"a")
         .replace(/\$/g,"s").replace(/[^a-z]/g,"");
-      if(!n) return false;
-      for(var i=0;i<BANNED.length;i++){ if(n.indexOf(BANNED[i])!==-1) return true; }
-      return false;
+      if(n){ for(var i=0;i<BANNED.length;i++){ if(n.indexOf(BANNED[i])!==-1) return true; } }
+      return looksLikeAddress(s);
     }
     function ask(){
       var f=document.getElementById('namefield');
