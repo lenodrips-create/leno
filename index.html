@@ -22,6 +22,9 @@
     padding-bottom:env(safe-area-inset-bottom,0px);
   }
   *,*::before,*::after{box-sizing:border-box;}
+  html,body,*,*::before,*::after{
+    cursor:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12'><rect x='.5' y='.5' width='11' height='11' fill='white' stroke='black'/></svg>") 6 6, auto !important;
+  }
   html{scroll-padding-top:env(safe-area-inset-top,0px);}
   body{
     margin:0;
@@ -110,7 +113,6 @@
   </video>
 
   <section class="movies">
-    <h2>movies</h2>
     <div class="grid" id="movies"></div>
   </section>
 
@@ -206,11 +208,7 @@ function card(g){
   return el;
 }
 
-const MOVIES = [
-  { id:"m-minecraft", name:"a minecraft movie", art:"movies/minecraft-movie/banner.jpg", href:"movies/minecraft-movie/", noCrop:true, blurFill:true, noStar:true },
-  { id:"m-gilmore", name:"happy gilmore", art:"movies/happy-gilmore/banner.jpg", href:"movies/happy-gilmore/", noCrop:true, blurFill:true, noStar:true }
-];
-MOVIES.forEach(m => document.getElementById("movies").appendChild(card(m)));
+document.getElementById("movies").appendChild(card({ id:"movies", name:"movies", art:"movies/banner.jpg", href:"movies/", noCrop:true, blurFill:true, noStar:true }));
 
 function render(){
   const all = document.getElementById("all");

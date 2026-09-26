@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>movies</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#000000;
+    --panel:#101014;
+    --line:#2a2a33;
+    --text:#ffffff;
+    --muted:#8b8f9c;
+    --accent:#4ade4a;
+    --star:#ffffff;
+    color-scheme:dark;
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body,*,*::before,*::after{
+    cursor:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12'><rect x='.5' y='.5' width='11' height='11' fill='white' stroke='black'/></svg>") 6 6, auto !important;
+  }
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Open Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    font-size:15px;line-height:1.5;
+    text-transform:lowercase;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1100px;margin:0 auto;padding:26px 18px 70px;}
+
+  .top{display:flex;flex-wrap:wrap;align-items:center;gap:14px;
+       padding-bottom:16px;border-bottom:1px solid var(--line);}
+  .brand{font-size:20px;font-weight:700;letter-spacing:-.02em;margin-right:auto;}
+  .top nav{display:flex;gap:16px;}
+  .top nav a{color:var(--muted);text-decoration:none;font-size:13px;}
+  .top nav a:hover,.top nav a:focus-visible{color:var(--text);}
+
+  .hero{display:block;width:100%;max-width:640px;aspect-ratio:16/9;object-fit:contain;background:#000;margin:20px auto 0;}
+  .hero[hidden]{display:none;}
+  .movies{margin-top:24px;}
+  .search{margin:20px auto 30px;max-width:320px;}
+  .search input{
+    width:100%;padding:11px 14px;border-radius:10px;
+    border:1px solid var(--line);background:var(--panel);
+    color:var(--text);font:inherit;text-transform:lowercase;
+  }
+  .search input::placeholder{color:var(--muted);}
+  .search input:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+
+
+  h2{font-size:14px;font-weight:600;color:var(--muted);margin:0 0 12px;}
+  section{margin-bottom:36px;}
+
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+
+  /* banner card */
+  .card{
+    position:relative;display:block;text-decoration:none;color:inherit;
+    aspect-ratio:16/7;
+    border:3px solid #d5d7dd;border-radius:18px;
+    overflow:hidden;background:#000;
+    isolation:isolate;
+  }
+  .card:hover{border-color:#fff;}
+    .card:focus-visible{outline:3px solid var(--accent);outline-offset:3px;}
+  .art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-1;}  .card.no-crop .art{object-fit:contain;background:#000;}
+  .card.blur-fill .art{background:transparent;}
+  .art-fill{position:absolute;inset:-20px;width:calc(100% + 40px);height:calc(100% + 40px);object-fit:cover;filter:blur(14px) brightness(.55);z-index:-2;}
+  .name{
+    position:absolute;inset:0;display:grid;place-items:center;
+    font-size:clamp(20px,2.6vw,32px);font-weight:600;color:#fff;
+    text-shadow:0 2px 10px rgba(0,0,0,.85),0 0 3px rgba(0,0,0,.9);
+    padding:0 40px;text-align:center;
+  }
+  .star{
+    position:absolute;top:8px;right:12px;
+    background:none;border:0;padding:2px;cursor:pointer;
+    color:var(--star);font-size:26px;line-height:1;
+    text-shadow:0 1px 6px rgba(0,0,0,.9);
+  }
+  .star[aria-pressed="true"]{color:#ffd84a;}
+  .star:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:5px;}
+
+  .empty{color:var(--muted);font-size:13px;border:1px dashed var(--line);
+         border-radius:14px;padding:22px;text-align:center;}
+  @media (max-width:760px){.grid{grid-template-columns:repeat(2,1fr);}
+    .name{font-size:clamp(20px,4vw,30px);}}
+  @media (max-width:480px){.grid{grid-template-columns:1fr;}
+    .card{aspect-ratio:16/5;}
+    .name{font-size:32px;}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="../" style="color:inherit;text-decoration:none">games</a>
+  </header>
+  <section style="margin-top:24px">
+    <h2>movies</h2>
+    <div class="grid" id="movies"></div>
+  </section>
+</div>
+<script>
+let starred = new Set();
+function save(){}
+function render(){}
+function card(g){
+  const on = starred.has(g.id);
+  const el = document.createElement("a");
+  el.className = "card" + (g.wide ? " wide-banner" : "") + (g.noCrop ? " no-crop" : "") + (g.blurFill ? " blur-fill" : "");
+  el.href = g.href || "#";
+  if (g.href) { el.target = "_blank"; el.rel = "noopener"; }
+  el.innerHTML =
+    (g.blurFill ? '<img class="art-fill" src="' + g.art + '" alt="">' : '') +
+    '<img class="art" src="' + g.art + '" alt="">' +
+    '<span class="name">' + g.name + '</span>' +
+    (g.noStar ? '' : '<button class="star" aria-pressed="' + on + '" aria-label="star ' + g.name + '">' +
+    (on ? "\u2605" : "\u2606") + '</button>');
+  if (g.noStar) return el;
+  el.querySelector(".star").addEventListener("click", e => {
+    e.preventDefault(); e.stopPropagation();
+    starred.has(g.id) ? starred.delete(g.id) : starred.add(g.id);
+    save(); render();
+  });
+  return el;
+}
+
+[
+  { id:"m-minecraft", name:"a minecraft movie", art:"minecraft-movie/banner.jpg", href:"minecraft-movie/", noCrop:true, blurFill:true, noStar:true },
+  { id:"m-gilmore", name:"happy gilmore", art:"happy-gilmore/banner.jpg", href:"happy-gilmore/", noCrop:true, blurFill:true, noStar:true }
+].forEach(m => document.getElementById("movies").appendChild(card(m)));
+</script>
+</body>
+</html>
