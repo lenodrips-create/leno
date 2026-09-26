@@ -108,50 +108,55 @@
     });
   }
 
-  // ---- widget --------------------------------------------------------------
-  var panel, open = false;
+  // ---- widget: glowing ring cards -----------------------------------------
+  var RINGS = ["#3ddc84", "#3b9dff", "#a855f7", "#f5a524", "#ec4899", "#22d3ee"];
+  var ICON_PERSON = '<svg viewBox="0 0 24 24" width="17" height="17" fill="#fff">' +
+    '<circle cx="12" cy="8" r="4"/><path d="M4 20.5C4 16.4 7.6 14 12 14s8 2.4 8 6.5V21H4z"/></svg>';
+  var ICON_GAME = '<svg viewBox="0 0 24 24" width="17" height="17" fill="#fff">' +
+    '<path d="M6.5 8h11a4.5 4.5 0 0 1 4.4 5.4l-.6 3A2.7 2.7 0 0 1 16.4 17l-1.2-1.6a1.5 1.5 0 0 0-1.2-.6h-4a1.5 1.5 0 0 0-1.2.6L7.6 17a2.7 2.7 0 0 1-4.9-.6l-.6-3A4.5 4.5 0 0 1 6.5 8z"/>' +
+    '<rect x="5.2" y="10.3" width="1.4" height="4" rx=".7" fill="#1b1d22"/>' +
+    '<rect x="3.9" y="11.6" width="4" height="1.4" rx=".7" fill="#1b1d22"/>' +
+    '<circle cx="16" cy="11.4" r="1" fill="#1b1d22"/><circle cx="18" cy="13.4" r="1" fill="#1b1d22"/></svg>';
+
+  var strip;
   function buildWidget() {
     var header = document.querySelector(".top");
-    var pill = document.createElement("button");
-    pill.id = "ed-presence-pill";
-    pill.type = "button";
-    var base = "display:inline-flex;align-items:center;gap:8px;padding:8px 13px;border-radius:999px;" +
-      "border:1px solid #2a2a33;background:#101014;color:#fff;font:inherit;font-size:13px;" +
-      "font-weight:600;cursor:pointer;";
-    pill.style.cssText = header
-      ? base + "order:-1;margin-right:6px;max-width:calc(100vw - 24px);overflow:hidden;"
-      : base + "position:fixed;top:12px;left:12px;z-index:9000;box-shadow:0 4px 14px rgba(0,0,0,.4);" +
-        "max-width:calc(100vw - 24px);overflow:hidden;";
-    pill.innerHTML = '<span style="width:9px;height:9px;border-radius:50%;background:#4ade4a;' +
-      'box-shadow:0 0 8px #4ade4a;flex:none"></span><span id="ed-count" style="flex:none">…</span>' +
-      '<span id="ed-inline" style="color:#8b8f9c;font-weight:400;white-space:nowrap;overflow:hidden;' +
-      'text-overflow:ellipsis"></span>';
-
-    panel = document.createElement("div");
-    panel.style.cssText = "position:fixed;top:60px;left:12px;z-index:9000;width:min(280px,86vw);" +
-      "max-height:60vh;overflow:auto;background:#101014;border:1px solid #2a2a33;border-radius:12px;" +
-      "padding:8px;display:none;box-shadow:0 8px 24px rgba(0,0,0,.5);font-size:14px";
-
-    pill.addEventListener("click", function () {
-      open = !open;
-      panel.style.display = open ? "block" : "none";
-    });
-    if (header) header.insertBefore(pill, header.firstChild);
-    else document.body.appendChild(pill);
-    document.body.appendChild(panel);
-  }
-
-  function setStatus(text) {
-    var c = document.getElementById("ed-count");
-    if (c) c.textContent = text;
-    var inline = document.getElementById("ed-inline");
-    if (inline) inline.textContent = "";
+    strip = document.createElement("div");
+    strip.id = "ed-presence";
+    var s = "display:flex;align-items:center;gap:10px;overflow-x:auto;overflow-y:hidden;" +
+      "-ms-overflow-style:none;scrollbar-width:none;";
+    strip.style.cssText = header
+      ? s + "order:-1;margin-right:12px;max-width:min(72vw,860px);"
+      : s + "position:fixed;top:10px;left:10px;z-index:9000;max-width:calc(100vw - 20px);";
+    // hide the scrollbar (webkit)
+    var st = document.createElement("style");
+    st.textContent = "#ed-presence::-webkit-scrollbar{display:none}";
+    document.head.appendChild(st);
+    if (header) header.insertBefore(strip, header.firstChild);
+    else document.body.appendChild(strip);
   }
 
   function esc(s) {
     return String(s).replace(/[&<>"]/g, function (c) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
     });
+  }
+
+  // one rounded card: colored glowing ring avatar + two lines of text
+  function card(ring, icon, title, sub, highlight) {
+    return '<div style="display:flex;align-items:center;gap:11px;flex:none;padding:5px 18px 5px 5px;' +
+      'border-radius:999px;background:' + (highlight ? "#181c22" : "#141619") + ';' +
+      'border:1px solid #23262d">' +
+      '<span style="width:38px;height:38px;border-radius:50%;flex:none;display:grid;place-items:center;' +
+      'background:#20242b;border:2px solid ' + ring + ';box-shadow:0 0 10px ' + ring + '66">' + icon + '</span>' +
+      '<span style="display:flex;flex-direction:column;line-height:1.15;white-space:nowrap">' +
+      '<span style="font-weight:700;font-size:15px;color:#fff">' + title + '</span>' +
+      '<span style="font-size:12px;color:#8b8f9c">' + sub + '</span></span></div>';
+  }
+
+  function setStatus(text) {
+    if (!strip) return;
+    strip.innerHTML = card("#3ddc84", ICON_PERSON, "—", text || "…", false);
   }
 
   function render(all) {
@@ -163,36 +168,27 @@
       if (!u || !u.ts || now - u.ts > ACTIVE_MS) continue;
       rows.push(u);
     }
-    rows.sort(function (a, b) { return (a.name || "").localeCompare(b.name || ""); });
+    rows.sort(function (a, b) {
+      if (a.name === myName) return -1;
+      if (b.name === myName) return 1;
+      return (a.name || "").localeCompare(b.name || "");
+    });
 
-    document.getElementById("ed-count").textContent = rows.length + " online";
+    // leading count card
+    var html = card("#3ddc84", ICON_PERSON, String(rows.length),
+      rows.length === 1 ? "online" : "online", false);
 
-    var inline = document.getElementById("ed-inline");
-    if (inline) {
-      inline.textContent = rows.length
-        ? "— " + rows.map(function (u) {
-            return u.name + " (" + (u.game ? u.game : "browsing") + ")";
-          }).join(" · ")
-        : "";
-    }
-
-    if (!rows.length) {
-      panel.innerHTML = '<div style="padding:10px;color:#8b8f9c">nobody online right now</div>';
-      return;
-    }
-    var html = "";
+    // one card per active user
     for (var i = 0; i < rows.length; i++) {
-      var mine = rows[i].name === myName;
-      var status = rows[i].game ? ("playing " + esc(rows[i].game)) : "browsing";
-      html +=
-        '<div style="display:flex;align-items:center;gap:9px;padding:8px 9px;border-radius:8px;' +
-        (mine ? "background:#16321a;" : "") + '">' +
-        '<span style="width:8px;height:8px;border-radius:50%;background:#4ade4a;flex:none"></span>' +
-        '<span style="flex:1;min-width:0"><span style="font-weight:600">' + esc(rows[i].name) +
-        (mine ? " (you)" : "") + '</span><br><span style="color:#8b8f9c;font-size:12px">' +
-        status + '</span></span></div>';
+      var u = rows[i];
+      var mine = u.name === myName;
+      var ring = RINGS[i % RINGS.length];
+      var playing = !!u.game;
+      var title = esc(u.name) + (mine ? " (you)" : "");
+      var sub = playing ? ("playing " + esc(u.game)) : "online";
+      html += card(ring, playing ? ICON_GAME : ICON_PERSON, title, sub, mine);
     }
-    panel.innerHTML = html;
+    strip.innerHTML = html;
   }
 
   // ---- boot ----------------------------------------------------------------
