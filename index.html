@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>edudeck</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -55,41 +56,27 @@
     </div>
 
     <form id="gate">
-      <button type="button" class="b-primary" onclick="go()">
+      <button type="button" class="b-primary" data-go>
         <span class="icon">📚</span> enter edudeck
       </button>
-      <button type="button" class="b-white" onclick="ask()">
+      <button type="button" class="b-white" data-ask>
         <span class="icon">🧑‍🎓</span> sign in with a name
       </button>
-      <button type="button" class="b-outline" onclick="go()">
+      <button type="button" class="b-outline" data-go>
         <span class="icon">▦</span> continue as guest
       </button>
 
       <div class="field" id="namefield">
-        <input id="name" placeholder="type any name" autocomplete="off"
-               onkeydown="if(event.key==='Enter'){event.preventDefault();go();}">
+        <input id="name" placeholder="type any name" autocomplete="off" maxlength="24">
       </div>
     </form>
 
     <div class="foot">
-      <a onclick="go()">new here? just jump in.</a>
-      <a onclick="go()">need help getting started?</a>
+      <a data-go>new here? just jump in.</a>
+      <a data-go>need help getting started?</a>
     </div>
   </div>
 
-  <script>
-    function ask(){
-      var f=document.getElementById('namefield');
-      f.classList.add('show');
-      document.getElementById('name').focus();
-    }
-    function go(){
-      // if they typed a name, remember it so the games page doesn't re-ask
-      var el = document.getElementById('name');
-      var n = el && el.value ? el.value.trim() : "";
-      if (n) { try { localStorage.setItem("edudeck_name", n); } catch(e){} }
-      window.location.href = "home.html";
-    }
-  </script>
+  <script src="gate.js"></script>
 </body>
 </html>

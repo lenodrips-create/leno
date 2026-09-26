@@ -1,0 +1,25 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "presence": {
+      ".read": "auth != null",
+      "$uid": {
+        ".write": "auth != null && auth.uid === $uid",
+        ".validate": "newData.hasChildren(['name', 'ts'])",
+        "name": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 24"
+        },
+        "game": {
+          ".validate": "newData.isString() && newData.val().length <= 40"
+        },
+        "ts": {
+          ".validate": "newData.isNumber() && newData.val() === now"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    }
+  }
+}
