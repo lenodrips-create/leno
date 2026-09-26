@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Survival Race</title>
+<style>
+html,body{margin:0;height:100%;overflow:hidden;background:#000;user-select:none}
+#unity-canvas{position:absolute;inset:0;width:100%;height:100%;background:#000}
+canvas:focus{outline:none}
+#cover{position:absolute;inset:0;background:url(background.jpg) center/cover}
+#box{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(420px,80vw);text-align:center}
+#box img{width:240px;max-width:60vw;margin-bottom:18px}
+#bar{height:14px;border:2px solid #fff;border-radius:8px;overflow:hidden;background:rgba(0,0,0,.5)}
+#fill{height:100%;width:0;background:#4caf50;transition:width .3s}
+#err{color:#f66;font:14px sans-serif;margin-top:12px}
+</style>
+</head>
+<body>
+<canvas id="unity-canvas" tabindex="-1"></canvas>
+<div id="cover"><div id="box"><img src="logo.png" alt=""><div id="bar"><div id="fill"></div></div><div id="err"></div></div></div>
+<script>
+let myGameInstance = null;
+        let ysdk = null;
+        let environmentData = {
+            language: "en", domain: "default_domain", deviceType: "desktop",
+            isMobile: false, isDesktop: true, isTablet: false, isTV: false,
+            appID: "default_app_id", browserLang: navigator.language || "en",
+            payload: null, promptCanShow: false, reviewCanShow: false,
+            platform: navigator.platform,
+            browser: (function() {
+                let userAgent = navigator.userAgent;
+                if (userAgent.includes("YaBrowser")) return "Yandex";
+                if (userAgent.includes("OPR") || userAgent.includes("Opera")) return "Opera";
+                if (userAgent.includes("Firefox")) return "Firefox";
+                if (userAgent.includes("MSIE") || userAgent.includes("Trident")) return "IE";
+                if (userAgent.includes("Edge")) return "Edge";
+                if (userAgent.includes("Chrome")) return "Chrome";
+                if (userAgent.includes("Safari")) return "Safari";
+                return "Other";
+            })()
+        };
+        
+        let cloudSaves = 'noData';
+        let paymentsData = 'none';
+        let playerData = 'noData';
+        let player = null;
+        let payments = null;
+        let initGame = false;
+        let nowFullAdOpen = false;
+
+        function GetPayments() { console.warn("GetPayments is not implemented"); return Promise.resolve("none"); }
+        function SaveCloud() { console.warn("SaveCloud is not implemented"); }
+        function LoadCloud() { console.warn("LoadCloud is not implemented"); return Promise.resolve("noData"); }
+        function InitPlayer() { console.warn("InitPlayer is not implemented"); return Promise.resolve("noData"); }
+        function FullAdShow() { console.warn("FullAdShow is not implemented"); }
+        function RewardedShow() { console.warn("RewardedShow is not implemented"); }
+        function StickyAdActivity() { console.warn("StickyAdActivity is not implemented"); }
+        function Review() { console.warn("Review is not implemented"); }
+        function PromptShow() { console.warn("PromptShow is not implemented"); }
+        function InitLeaderboards() { console.warn("InitLeaderboards is not implemented"); }
+        function GetLeaderboardScores() { console.warn("GetLeaderboardScores is not implemented"); }
+        function SetLeaderboardScores() { console.warn("SetLeaderboardScores is not implemented"); }
+        function ConsumePurchase() { console.warn("ConsumePurchase is not implemented"); }
+        function ConsumePurchases() { console.warn("ConsumePurchases is not implemented"); }
+        function InitLeaderboard() { console.warn("InitLeaderboard is not implemented"); }
+        function BuyPayments() { console.warn("BuyPayments is not implemented"); }
+
+function InitGame() {
+  initGame = true;
+  if (nowFullAdOpen === true && myGameInstance != null) myGameInstance.SendMessage('YandexGame', 'OpenFullAd');
+}
+window.addEventListener("unhandledrejection", function (e) { e.preventDefault(); });
+
+var fill = document.getElementById("fill");
+(async function () {
+  try {
+    var parts = [];
+    for (var i = 1; i <= 2; i++) {
+      var r = await fetch("Build/yandexBrotli.wasm.br.part" + i);
+      if (!r.ok) throw new Error("missing wasm part " + i);
+      parts.push(await r.arrayBuffer());
+      fill.style.width = (25 * i) + "%";
+    }
+    var codeUrl = URL.createObjectURL(new Blob(parts));
+    var s = document.createElement("script");
+    s.src = "Build/yandexBrotli.loader.js";
+    s.onload = function () {
+      createUnityInstance(document.getElementById("unity-canvas"), {
+        dataUrl: "Build/yandexBrotli.data.br",
+        frameworkUrl: "Build/yandexBrotli.framewor.js",
+        codeUrl: codeUrl,
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "Brain massage", productName: "Supercar Battle Royale", productVersion: "0.0.197"
+      }, function (p) { fill.style.width = (50 + 50 * p) + "%"; })
+      .then(function (inst) { myGameInstance = inst; document.getElementById("cover").remove(); })
+      .catch(function (e) { document.getElementById("err").textContent = e; });
+    };
+    document.body.appendChild(s);
+  } catch (e) { document.getElementById("err").textContent = e.message; }
+})();
+window.addEventListener("pointerdown", function () { window.focus(); document.getElementById("unity-canvas").focus(); });
+document.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+</script>
+</body>
+</html>
