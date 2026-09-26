@@ -43,6 +43,7 @@
 
   .hero{display:block;width:100%;max-width:640px;aspect-ratio:16/9;object-fit:contain;background:#000;margin:20px auto 0;}
   .hero[hidden]{display:none;}
+  .movies{margin-top:24px;}
   .search{margin:20px auto 30px;max-width:320px;}
   .search input{
     width:100%;padding:11px 14px;border-radius:10px;
@@ -107,6 +108,11 @@
     <source src="top.mp4" type="video/mp4">
     <source src="top.webm" type="video/webm" onerror="this.parentNode.remove()">
   </video>
+
+  <section class="movies">
+    <h2>movies</h2>
+    <div class="grid" id="movies"></div>
+  </section>
 
   <div class="search">
     <input id="q" type="search" placeholder="search games" aria-label="search games">
@@ -199,6 +205,12 @@ function card(g){
   });
   return el;
 }
+
+const MOVIES = [
+  { id:"m-minecraft", name:"a minecraft movie", art:"movies/minecraft-movie/banner.jpg", href:"movies/minecraft-movie/", noCrop:true, blurFill:true, noStar:true },
+  { id:"m-gilmore", name:"happy gilmore", art:"movies/happy-gilmore/banner.jpg", href:"movies/happy-gilmore/", noCrop:true, blurFill:true, noStar:true }
+];
+MOVIES.forEach(m => document.getElementById("movies").appendChild(card(m)));
 
 function render(){
   const all = document.getElementById("all");
