@@ -47,6 +47,8 @@
   .hero{display:block;width:100%;max-width:640px;aspect-ratio:16/9;object-fit:contain;background:#000;margin:20px auto 0;}
   .hero[hidden]{display:none;}
   .movies{margin-top:24px;}
+  .movies .grid{display:flex;justify-content:center;}
+  .movies .card{width:calc((100% - 36px) / 3);}
   .search{margin:20px auto 30px;max-width:320px;}
   .search input{
     width:100%;padding:11px 14px;border-radius:10px;
@@ -93,8 +95,10 @@
   .empty{color:var(--muted);font-size:13px;border:1px dashed var(--line);
          border-radius:14px;padding:22px;text-align:center;}
   @media (max-width:760px){.grid{grid-template-columns:repeat(2,1fr);}
+    .movies .card{width:calc((100% - 18px) / 2);}
     .name{font-size:clamp(20px,4vw,30px);}}
   @media (max-width:480px){.grid{grid-template-columns:1fr;}
+    .movies .card{width:100%;}
     .card{aspect-ratio:16/5;}
     .name{font-size:32px;}}
   @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
