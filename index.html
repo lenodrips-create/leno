@@ -84,7 +84,10 @@
       document.getElementById('name').focus();
     }
     function go(){
-      // any name is accepted and ignored; nothing is stored or sent
+      // if they typed a name, remember it so the games page doesn't re-ask
+      var el = document.getElementById('name');
+      var n = el && el.value ? el.value.trim() : "";
+      if (n) { try { localStorage.setItem("edudeck_name", n); } catch(e){} }
       window.location.href = "home.html";
     }
   </script>
