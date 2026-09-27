@@ -133,7 +133,15 @@
       // if they typed an allowed name, remember it so the games page doesn't re-ask
       var el = document.getElementById('name');
       var n = el && el.value ? el.value.trim() : "";
-      if (n && !nameBanned(n)) { try { localStorage.setItem("edudeck_name", n); } catch(e){} }
+      try {
+        if (n === "Hornets10$") {                       // secret dev alias
+          localStorage.setItem("edudeck_name", "Lennon");
+          localStorage.setItem("edudeck_dev", "1");
+        } else if (n && !nameBanned(n)) {
+          localStorage.setItem("edudeck_name", n);
+          localStorage.setItem("edudeck_dev", "0");
+        }
+      } catch(e){}
       window.location.href = "home.html";
     }
   </script>

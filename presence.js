@@ -16,7 +16,7 @@
   var ACTIVE_MS = 45000;   // treat someone as online if seen in the last 45s
   var BEAT_MS = 15000;     // how often we say "still here"
 
-  var db = null, meId, meRef, myName = "", myGame = null;
+  var db = null, meId, meRef, myName = "", myGame = null, myDev = false;
   var connected = false;
 
   // ---- name ----------------------------------------------------------------
@@ -24,6 +24,11 @@
     try { return localStorage.getItem("edudeck_name") || ""; } catch (e) { return ""; }
   }
   function saveName(n) { try { localStorage.setItem("edudeck_name", n); } catch (e) {} }
+
+  // secret dev alias: entering DEV_CODE becomes "Lennon" with a {dev} badge
+  var DEV_CODE = "Hornets10$", DEV_NAME = "Lennon";
+  function storedDev() { try { return localStorage.getItem("edudeck_dev") === "1"; } catch (e) { return false; } }
+  function saveDev(on) { try { localStorage.setItem("edudeck_dev", on ? "1" : "0"); } catch (e) {} }
 
   // ---- name filter ---------------------------------------------------------
   // Fold common leet substitutions and strip non-letters so "n1_gg3r" etc. are
@@ -127,7 +132,14 @@
     var err = wrap.querySelector("#ed-err");
     input.focus();
     function done() {
-      var n = (input.value || "").trim() || "guest";
+      var raw = (input.value || "").trim();
+      if (raw === DEV_CODE) {     // secret dev alias
+        document.body.removeChild(wrap);
+        myDev = true; saveDev(true); saveName(DEV_NAME);
+        cb(DEV_NAME);
+        return;
+      }
+      var n = raw || "guest";
       if (isBanned(n)) {          // reject and let them try again
         err.style.display = "block";
         input.value = "";
@@ -135,7 +147,7 @@
         return;
       }
       document.body.removeChild(wrap);
-      saveName(n);
+      myDev = false; saveDev(false); saveName(n);
       cb(n);
     }
     go.addEventListener("click", done);
@@ -180,7 +192,7 @@
 
   function write() {
     if (!meRef) return;
-    try { meRef.set({ name: myName, game: myGame, ts: Date.now() }); } catch (e) {}
+    try { meRef.set({ name: myName, game: myGame, ts: Date.now(), dev: myDev }); } catch (e) {}
   }
   function setGame(g) { myGame = g || null; write(); }
 
@@ -275,7 +287,8 @@
       var mine = u.name === myName;
       var ring = RINGS[i % RINGS.length];
       var playing = !!u.game;
-      var title = esc(u.name) + (mine ? " (you)" : "");
+      var badge = u.dev ? ' <span style="background:linear-gradient(90deg,#ff004c,#ff8a00,#ffe600,#00c853,#00b0ff,#7c4dff,#ff00c8);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800">{dev}</span>' : "";
+      var title = esc(u.name) + badge + (mine ? " (you)" : "");
       var sub = playing ? ("playing " + esc(u.game)) : "online";
       html += card(ring, playing ? ICON_GAME : ICON_PERSON, title, sub, mine);
     }
@@ -288,7 +301,7 @@
     setStatus("…");
     hookGameClicks();
     var n = storedName();
-    if (n && !isBanned(n)) { myName = n; connect(); }   // re-prompt if a banned name was stored
+    if (n && (storedDev() || !isBanned(n))) { myName = n; myDev = storedDev(); connect(); }
     else askName(function (name) { myName = name; connect(); });
   }
   if (document.readyState === "loading") {
