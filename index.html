@@ -97,7 +97,16 @@
       "fuck","shit","bitch","cunt","pussy","dick","cock","penis","vagina",
       "porn","sex","rape","wop","dago","kraut","kkk",
       "niqqa","niqqer","niqa","knigger","fgt","phag","biatch","beetch",
-      "azn","kunt","phuk","phuck","shiit"];
+      "azn","kunt","phuk","phuck","shiit",
+      "jiggaboo","mooncricket","cottonpicker","spearchucka","nigglet",
+      "prairienigger","timbernigger","ofay","gweilo","redneck","hillbilly",
+      "trailertrash","inbred","greaseball","mojado","tacobender","wetneck",
+      "chinky","ching","chong","slopehead","buddhahead","riceball",
+      "haji","hadji","dunecoon","sandmonkey","camelfucker","muzzrat",
+      "sheeny","christkiller","ovendodger","chug","gyppo","pikey",
+      "fudgepacker","carpetmuncher","buttpirate","battyboy","fairy","poon",
+      "sped","windowlicker","veggie","whore","slut","faggy","homofag",
+      "jigg","wigger","wigga"];
     function normName(s){
       return String(s).toLowerCase()
         .replace(/ph/g,"f").replace(/vv/g,"w")
@@ -108,11 +117,14 @@
     }
     function collapse(s){ return s.replace(/(.)\1+/g,"$1"); }
     var BANNED_COLLAPSED=BANNED.map(collapse).filter(function(w){return w.length>=4;});
-    var STREET=/\b(st|street|ave|avenue|rd|road|ln|lane|dr|drive|blvd|boulevard|ct|court|cir|circle|way|place|pl|hwy|highway|terrace|ter|apt|suite|ste)\b/;
+    var STREET=/(street|avenue|\bave\b|\brd\b|road|\bln\b|lane|\bdr\b|drive|boulevard|\bblvd\b|\bct\b|court|circle|\bcir\b|\bway\b|place|\bpl\b|highway|\bhwy\b|terrace|\bter\b|\bapt\b|suite|\bste\b|\bunit\b|\bbox\b|\bpo\b|\bcrescent\b|\bcres\b|parkway|\bpkwy\b|\bloop\b|\btrail\b|\btrl\b)/;
+    var DIRN=/\b(north|south|east|west|n|s|e|w|ne|nw|se|sw)\b/;
     function looksLikeAddress(s){
       s=String(s).toLowerCase();
-      if(/\d{5}/.test(s)) return true;
-      if(/\d/.test(s)&&STREET.test(s)) return true;
+      if(/\d{4,}/.test(s)) return true;
+      if(STREET.test(s)) return true;
+      if(/\d{1,6}\s*[a-z]/.test(s)) return true;
+      if(/[a-z]\s*\d{1,6}/.test(s)&&DIRN.test(s)) return true;
       return false;
     }
     function nameBanned(s){

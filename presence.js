@@ -68,7 +68,17 @@
     "vagina", "porn", "sex", "rape", "wop", "dago", "kraut", "kkk",
     // common evasion spellings the folder won't catch on its own
     "niqqa", "niqqer", "niqa", "knigger", "fgt", "phag", "biatch", "beetch",
-    "azn", "kunt", "phuk", "phuck", "shiit"
+    "azn", "kunt", "phuk", "phuck", "shiit",
+    // additional slurs
+    "jiggaboo", "mooncricket", "cottonpicker", "spearchucka", "nigglet",
+    "prairienigger", "timbernigger", "ofay", "gweilo", "redneck", "hillbilly",
+    "trailertrash", "inbred", "greaseball", "mojado", "tacobender", "wetneck",
+    "chinky", "ching", "chong", "slopehead", "buddhahead", "riceball",
+    "haji", "hadji", "dunecoon", "sandmonkey", "camelfucker", "muzzrat",
+    "sheeny", "christkiller", "ovendodger", "chug", "gyppo", "pikey",
+    "fudgepacker", "carpetmuncher", "buttpirate", "battyboy", "fairy", "poon",
+    "sped", "windowlicker", "veggie", "whore", "slut", "faggy", "homofag",
+    "chinaman", "jigg", "wigger", "wigga"
   ];
   // Fold symbol/letter lookalikes and leet so "n1_gg3r", "phaggot", "|<ike" all
   // reduce to plain letters before matching.
@@ -89,12 +99,15 @@
     var _c = collapse(BANNED[_i]);
     if (_c.length >= 4) BANNED_COLLAPSED.push(_c);
   }
-  // Looks like a real street address / postal code (block for privacy).
-  var STREET = /\b(st|street|ave|avenue|rd|road|ln|lane|dr|drive|blvd|boulevard|ct|court|cir|circle|way|place|pl|hwy|highway|terrace|ter|apt|suite|ste)\b/;
+  // Block anything that even resembles an address (aggressive, for privacy).
+  var STREET = /(street|avenue|\bave\b|\brd\b|road|\bln\b|lane|\bdr\b|drive|boulevard|\bblvd\b|\bct\b|court|circle|\bcir\b|\bway\b|place|\bpl\b|highway|\bhwy\b|terrace|\bter\b|\bapt\b|suite|\bste\b|\bunit\b|\bbox\b|\bpo\b|\bcrescent\b|\bcres\b|parkway|\bpkwy\b|\bcourtyard\b|\bloop\b|\btrail\b|\btrl\b)/;
+  var DIRN = /\b(north|south|east|west|\bn\b|\bs\b|\be\b|\bw\b|ne|nw|se|sw)\b/;
   function looksLikeAddress(name) {
     var s = String(name).toLowerCase();
-    if (/\d{5}/.test(s)) return true;                 // zip code
-    if (/\d/.test(s) && STREET.test(s)) return true;  // number + street word
+    if (/\d{4,}/.test(s)) return true;                 // 4+ digit run (zip / long number)
+    if (STREET.test(s)) return true;                   // any street-type word
+    if (/\d{1,6}\s*[a-z]/.test(s)) return true;        // number next to letters ("12 oak", "7b")
+    if (/[a-z]\s*\d{1,6}/.test(s) && DIRN.test(s)) return true;
     return false;
   }
   function isBanned(name) {
