@@ -58,13 +58,29 @@
     "dress", "dresses",
     // general profanity
     "fuck", "shit", "bitch", "cunt", "pussy", "dick", "cock", "penis",
-    "vagina", "porn", "sex", "rape", "wop", "dago", "kraut", "kkk"
+    "vagina", "porn", "sex", "rape", "wop", "dago", "kraut", "kkk",
+    // common evasion spellings the folder won't catch on its own
+    "niqqa", "niqqer", "niqa", "knigger", "fgt", "phag", "biatch", "beetch",
+    "azn", "kunt", "phuk", "phuck", "shiit"
   ];
+  // Fold symbol/letter lookalikes and leet so "n1_gg3r", "phaggot", "|<ike" all
+  // reduce to plain letters before matching.
   function normName(s) {
     return String(s).toLowerCase()
-      .replace(/0/g, "o").replace(/1/g, "i").replace(/3/g, "e").replace(/4/g, "a")
-      .replace(/5/g, "s").replace(/7/g, "t").replace(/8/g, "b").replace(/@/g, "a")
-      .replace(/\$/g, "s").replace(/[^a-z]/g, "");
+      .replace(/ph/g, "f").replace(/vv/g, "w").replace(/\\\/|\|_\||\\\\/g, "w")
+      .replace(/[0]/g, "o").replace(/[1!|íìî]/g, "i").replace(/[3€]/g, "e")
+      .replace(/[4@àáâ]/g, "a").replace(/[5$§]/g, "s").replace(/[7+]/g, "t")
+      .replace(/[8]/g, "b").replace(/[6]/g, "g").replace(/[9]/g, "g")
+      .replace(/[()<>{}\[\]]/g, "c").replace(/[^a-z]/g, "");
+  }
+  // Drop runs of a repeated letter to one, so "niiigggeeer" -> "niger".
+  function collapse(s) { return s.replace(/(.)\1+/g, "$1"); }
+  // Collapsed forms of long enough words, to catch stretched spellings without
+  // turning short words (coon->con, gay) into false positives.
+  var BANNED_COLLAPSED = [];
+  for (var _i = 0; _i < BANNED.length; _i++) {
+    var _c = collapse(BANNED[_i]);
+    if (_c.length >= 4) BANNED_COLLAPSED.push(_c);
   }
   // Looks like a real street address / postal code (block for privacy).
   var STREET = /\b(st|street|ave|avenue|rd|road|ln|lane|dr|drive|blvd|boulevard|ct|court|cir|circle|way|place|pl|hwy|highway|terrace|ter|apt|suite|ste)\b/;
@@ -79,6 +95,10 @@
     if (n) {
       for (var i = 0; i < BANNED.length; i++) {
         if (n.indexOf(BANNED[i]) !== -1) return true;
+      }
+      var c = collapse(n);
+      for (var j = 0; j < BANNED_COLLAPSED.length; j++) {
+        if (c.indexOf(BANNED_COLLAPSED[j]) !== -1) return true;
       }
     }
     return looksLikeAddress(name);

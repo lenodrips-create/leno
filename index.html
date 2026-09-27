@@ -95,7 +95,19 @@
       "retard","tard","spastic","spaz","cripple","mongoloid",
       "gyp","gypsy","dress","dresses",
       "fuck","shit","bitch","cunt","pussy","dick","cock","penis","vagina",
-      "porn","sex","rape","wop","dago","kraut","kkk"];
+      "porn","sex","rape","wop","dago","kraut","kkk",
+      "niqqa","niqqer","niqa","knigger","fgt","phag","biatch","beetch",
+      "azn","kunt","phuk","phuck","shiit"];
+    function normName(s){
+      return String(s).toLowerCase()
+        .replace(/ph/g,"f").replace(/vv/g,"w")
+        .replace(/[0]/g,"o").replace(/[1!|]/g,"i").replace(/[3]/g,"e")
+        .replace(/[4@]/g,"a").replace(/[5$]/g,"s").replace(/[7+]/g,"t")
+        .replace(/[8]/g,"b").replace(/[6]/g,"g").replace(/[9]/g,"g")
+        .replace(/[()<>{}\[\]]/g,"c").replace(/[^a-z]/g,"");
+    }
+    function collapse(s){ return s.replace(/(.)\1+/g,"$1"); }
+    var BANNED_COLLAPSED=BANNED.map(collapse).filter(function(w){return w.length>=4;});
     var STREET=/\b(st|street|ave|avenue|rd|road|ln|lane|dr|drive|blvd|boulevard|ct|court|cir|circle|way|place|pl|hwy|highway|terrace|ter|apt|suite|ste)\b/;
     function looksLikeAddress(s){
       s=String(s).toLowerCase();
@@ -104,11 +116,12 @@
       return false;
     }
     function nameBanned(s){
-      var n=String(s).toLowerCase()
-        .replace(/0/g,"o").replace(/1/g,"i").replace(/3/g,"e").replace(/4/g,"a")
-        .replace(/5/g,"s").replace(/7/g,"t").replace(/8/g,"b").replace(/@/g,"a")
-        .replace(/\$/g,"s").replace(/[^a-z]/g,"");
-      if(n){ for(var i=0;i<BANNED.length;i++){ if(n.indexOf(BANNED[i])!==-1) return true; } }
+      var n=normName(s);
+      if(n){
+        for(var i=0;i<BANNED.length;i++){ if(n.indexOf(BANNED[i])!==-1) return true; }
+        var c=collapse(n);
+        for(var j=0;j<BANNED_COLLAPSED.length;j++){ if(c.indexOf(BANNED_COLLAPSED[j])!==-1) return true; }
+      }
       return looksLikeAddress(s);
     }
     function ask(){
