@@ -88,8 +88,16 @@
     "bugger", "skank", "thot", "clit", "schlong", "wiener", "knob", "fanny",
     "minge", "horny", "orgasm", "masturbate", "ejaculate", "semen", "scrotum",
     "ballsack", "nutsack", "cameltoe", "milf", "gilf", "hentai", "coochie",
-    "choad", "queef", "smegma", "cocksucker", "cocksuck", "cumming"
+    "choad", "queef", "smegma", "cocksucker", "cocksuck", "cumming",
+    // abbreviations / bad-content terms
+    "csam", "childporn", "pedo", "pedophile", "loli", "lolicon", "shota",
+    "shotacon", "jailbait", "pthc", "cheesepizza", "groomer",
+    "pornhub", "xvideos", "xnxx", "xhamster", "onlyfans", "brazzers", "redtube",
+    "kys", "kms"
   ];
+  // Short codes matched only as the WHOLE name (before ph->f folding) so they
+  // don't clobber "Phil", "Joseph", "cupid", etc.
+  var ACRO = ["cp", "ph", "jb", "csam"];
   // Fold symbol/letter lookalikes and leet so "n1_gg3r", "phaggot", "|<ike" all
   // reduce to plain letters before matching.
   function normName(s) {
@@ -121,6 +129,8 @@
     return false;
   }
   function isBanned(name) {
+    var acro = String(name).toLowerCase().replace(/[^a-z]/g, "");
+    if (ACRO.indexOf(acro) !== -1) return true;   // exact short-code names
     var n = normName(name);
     if (n) {
       for (var i = 0; i < BANNED.length; i++) {
