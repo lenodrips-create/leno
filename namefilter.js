@@ -67,7 +67,7 @@
     "neeger", "kneegrow", "neegrow", "nignog", "spyc",
     // Hitler / nazi salutes and respellings
     "adolf", "hitla", "hitlar", "hitlor", "hitlur", "hitlir", "hitlah", "hitlr",
-    "htler", "heilhitler", "siegheil", "seigheil", "sieghail", "fuhrer",
+    "htler", "htlr", "heilhitler", "siegheil", "seigheil", "sieghail", "fuhrer",
     "fuehrer", "furher", "meinkampf", "natzi",
     // 271 spelled out
     "twoseventyone", "twoseventy1", "twohundredseventyone", "twosevenone"
@@ -78,18 +78,21 @@
   // don't clobber "Phil", "Joseph", "cupid", etc.
   var ACRO = ["cp", "ph", "jb", "csam", "hh"];
   // Too short to match inside other names, but blocked as the whole name.
-  var WHOLE = ["nig", "nigs", "nigz", "nigg", "nigr", "fqg", "fgs", "heil"];
+  var WHOLE = ["nig", "nigs", "nigz", "nigg", "nigr", "fqg", "fgs", "heil", "hitr"];
   // Real names that look like a misspelled slur; removed before the fuzzy
   // checks ("randolph" is "adolf" with an extra letter).
   var SAFE = ["randolf", "whistl"];
 
   // The worst slurs get the extra checks below (misspellings, sound-alikes).
-  var SEVERE = ["nigger", "nigga", "faggot", "hitler", "adolf"];
-  // These skip the swapped-letter check: it would hit "enigma", "benign",
-  // "hitter" and "adolescent".
-  var NO_SWAP = ["nigga", "hitler", "adolf"];
-  // And this one skips the missing-letter check ("hitter", "chiller").
-  var NO_DROP = ["hitler"];
+  var SEVERE = ["nigger", "nigga", "faggot"];
+  // "nigga" skips the swapped-letter check: it would hit "enigma", "benign".
+  var NO_SWAP = ["nigga"];
+  // Caught with ANY one-letter change (added, missing, swapped, flipped) or
+  // two extra letters; real words that land within that are in DEEP_SAFE.
+  var DEEP = ["hitler", "adolf"];
+  var DEEP_SAFE = ["randolf", "rudolf", "rodolf", "adolesc", "dolfin", "ladelf",
+    "leadof", "hitter", "hiller", "hither", "whiter", "whittl", "whistl",
+    "littler", "shuttl", "wheel", "heel", "whitle"];
   // Roots checked against the sound-alike version of the name.
   var SOUND_ROOTS = ["nigger", "nigga", "niger", "niga", "faggot", "fagot",
     "fag", "chink", "hitler", "hitla", "adolf"];
@@ -185,6 +188,37 @@
     return k === w.length && s[0] === w[0];
   }
 
+  // Any single edit, including the first letter.
+  function oneEdit(t, w) {
+    var k, L = w.length;
+    if (t.length === L) {
+      var diff = 0;
+      for (k = 0; k < L; k++) if (t[k] !== w[k]) diff++;
+      if (diff <= 1) return true;
+      for (k = 0; k + 1 < L; k++) {
+        if (w.slice(0, k) + w[k + 1] + w[k] + w.slice(k + 2) === t) return true;
+      }
+      return false;
+    }
+    if (t.length === L + 1) return oneInserted(t, w);
+    if (t.length === L - 1) {
+      for (k = 0; k < L; k++) if (w.slice(0, k) + w.slice(k + 1) === t) return true;
+    }
+    return false;
+  }
+  function deepHit(s) {
+    for (var i = 0; i < DEEP.length; i++) {
+      var w = DEEP[i], L = w.length;
+      for (var j = 0; j < s.length; j++) {
+        for (var len = L - 1; len <= L + 1; len++) {
+          if (j + len <= s.length && oneEdit(s.substr(j, len), w)) return true;
+        }
+        if (L >= 6 && spreadOut(s.substr(j, L + 2), w)) return true;
+      }
+    }
+    return false;
+  }
+
   function contains(s, list) {
     for (var i = 0; i < list.length; i++) if (s.indexOf(list[i]) !== -1) return true;
     return false;
@@ -203,7 +237,7 @@
       for (j = 0; j < s.length; j++) {
         if (NO_SWAP.indexOf(w) === -1 && oneSwapped(s.substr(j, L), w)) return true;
         if (transposed(s.substr(j, L), w)) return true;
-        if (L >= 6 && NO_DROP.indexOf(w) === -1 && oneDropped(s.substr(j, L - 1), w)) return true;
+        if (L >= 6 && oneDropped(s.substr(j, L - 1), w)) return true;
         // up to two extra letters mixed in (one for the short "nigga")
         if (spreadOut(s.substr(j, L + (L >= 6 ? 2 : 1)), w)) return true;
       }
@@ -238,6 +272,10 @@
       if (contains(p, SOUND_ROOTS) || contains(pc, SOUND_ROOTS)) return true;
       if (contains(reverse(n), ["nigger", "faggot", "hitler", "adolf"])) return true;   // "reggin"
       if (fuzzyHit(n) || fuzzyHit(c) || fuzzyHit(p) || fuzzyHit(pc)) return true;
+      var d = n;
+      for (var i = 0; i < DEEP_SAFE.length; i++) d = d.split(DEEP_SAFE[i]).join("-");
+      var dp = soundAlike(d);
+      if (deepHit(d) || deepHit(collapse(d)) || deepHit(dp) || deepHit(collapse(dp))) return true;
     }
     return looksLikeAddress(name);
   }
