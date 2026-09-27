@@ -248,27 +248,35 @@
       if (!u.ts || now - u.ts > ACTIVE_MS) continue;
       rows.push(u);
     }
+    // the dev is pinned first for everyone, then you, then A-Z
+    function isPinned(u) { return !!u.dev && u.name === DEV_NAME; }
     rows.sort(function (a, b) {
+      if (isPinned(a) !== isPinned(b)) return isPinned(a) ? -1 : 1;
       if (a.name === myName) return -1;
       if (b.name === myName) return 1;
       return (a.name || "").localeCompare(b.name || "");
     });
 
-    // leading count card
-    var html = card("#3ddc84", ICON_PERSON, String(rows.length),
-      rows.length === 1 ? "online" : "online", false);
+    // leading count card, with the pinned dev card beside it; both stay put
+    // while the rest of the list scrolls under them
+    var html = '<div style="position:sticky;left:0;z-index:1;display:flex;gap:10px;flex:none">' +
+      card("#3ddc84", ICON_PERSON, String(rows.length), "online", false);
+    var pinnedOpen = true;
 
     // one card per active user
     for (var i = 0; i < rows.length; i++) {
       var u = rows[i];
-      var mine = u.name === myName;
+      var pin = isPinned(u);
+      if (!pin && pinnedOpen) { html += "</div>"; pinnedOpen = false; }
+      var mine = u.name === myName && !!u.dev === myDev;
       var ring = RINGS[i % RINGS.length];
       var playing = !!u.game;
       var badge = u.dev ? ' <span style="background:linear-gradient(90deg,#ff004c,#ff8a00,#ffe600,#00c853,#00b0ff,#7c4dff,#ff00c8);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800">{dev}</span>' : "";
-      var title = esc(u.name) + badge + (mine ? " (you)" : "");
+      var title = (pin ? "\uD83D\uDCCC " : "") + esc(u.name) + badge + (mine ? " (you)" : "");
       var sub = playing ? ("playing " + esc(u.game)) : "online";
-      html += card(ring, playing ? ICON_GAME : ICON_PERSON, title, sub, mine);
+      html += card(ring, playing ? ICON_GAME : ICON_PERSON, title, sub, mine || pin);
     }
+    if (pinnedOpen) html += "</div>";
     strip.innerHTML = html;
   }
 
