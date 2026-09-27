@@ -158,6 +158,7 @@
 
   // ---- firebase ------------------------------------------------------------
   function connect() {
+    if (myDev) buildDevControls();   // show the pause button as soon as we know we're dev
     if (!window.firebase || !firebase.database) {
       setStatus("offline — can’t reach the server");
       console.warn("[presence] Firebase library did not load (network/filter blocked gstatic.com).");
@@ -192,7 +193,6 @@
       });
 
     // site pause: dev gets a toggle, everyone else gets the "be right back" screen
-    if (myDev) buildDevControls();
     db.ref("site/paused").on("value", function (s) {
       sitePaused = !!(s && s.val());
       applyPause();
