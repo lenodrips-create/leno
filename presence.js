@@ -78,7 +78,7 @@
     "sheeny", "christkiller", "ovendodger", "chug", "gyppo", "pikey",
     "fudgepacker", "carpetmuncher", "buttpirate", "battyboy", "fairy", "poon",
     "sped", "windowlicker", "veggie", "whore", "slut", "faggy", "homofag",
-    "chinaman", "jigg", "wigger", "wigga"
+    "chinaman", "jigg", "wigger", "wigga", "hykes", "hyke"
   ];
   // Fold symbol/letter lookalikes and leet so "n1_gg3r", "phaggot", "|<ike" all
   // reduce to plain letters before matching.
