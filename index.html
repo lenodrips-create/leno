@@ -79,15 +79,23 @@
 
   <script>
     // block slurs / banned words as names (mirrors presence.js)
-    var BANNED = ["nigger","nigga","faggot","faggit","fag","retard","chink","spic",
-      "kike","wetback","coon","tranny","dyke","beaner","gook","paki",
-      "goy","goyim","heeb","yid","shylock","kkk","negro","jigaboo","spook",
-      "darkie","sambo","raghead","towelhead","sandnigger","zipperhead","wop",
-      "dago","kraut","jap","homo","groid","porchmonkey","mongoloid","gyp",
-      "redskin","savage",
-      "jew","jews","gay","dress","dresses",
+    var BANNED = ["nigger","nigga","niger","coon","jigaboo","spook","darkie","darky",
+      "sambo","negro","groid","porchmonkey","junglebunny","tarbaby","pickaninny",
+      "golliwog","moolie","moulie","buckwheat","spearchucker",
+      "honky","honkey","cracker","whitey","gringo","peckerwood","wonderbread",
+      "spic","spik","beaner","wetback","greaser","cholo",
+      "chink","gook","jap","slant","slanteye","zipperhead","chingchong",
+      "dink","coolie","chinaman",
+      "raghead","towelhead","sandnigger","cameljockey","muzzie","paki",
+      "redskin","injun","squaw","savage",
+      "kike","kyke","heeb","yid","shylock","hymie","goy","goyim","jew","jews",
+      "nazi","hitler","shekel",
+      "faggot","faggit","fag","dyke","tranny","homo","poofter","poof","shemale",
+      "ladyboy","queer","gay",
+      "retard","tard","spastic","spaz","cripple","mongoloid",
+      "gyp","gypsy","dress","dresses",
       "fuck","shit","bitch","cunt","pussy","dick","cock","penis","vagina",
-      "porn","sex","rape","nazi","hitler"];
+      "porn","sex","rape","wop","dago","kraut","kkk"];
     var STREET=/\b(st|street|ave|avenue|rd|road|ln|lane|dr|drive|blvd|boulevard|ct|court|cir|circle|way|place|pl|hwy|highway|terrace|ter|apt|suite|ste)\b/;
     function looksLikeAddress(s){
       s=String(s).toLowerCase();

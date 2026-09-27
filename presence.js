@@ -29,18 +29,36 @@
   // Fold common leet substitutions and strip non-letters so "n1_gg3r" etc. are
   // still caught, then block any name containing a listed word.
   var BANNED = [
-    // slurs
-    "nigger", "nigga", "faggot", "faggit", "fag", "retard", "chink", "spic",
-    "kike", "wetback", "coon", "tranny", "dyke", "beaner", "gook", "paki",
-    "goy", "goyim", "heeb", "yid", "shylock", "kkk", "negro", "jigaboo",
-    "spook", "darkie", "sambo", "raghead", "towelhead", "sandnigger",
-    "zipperhead", "wop", "dago", "kraut", "jap", "homo", "groid",
-    "porchmonkey", "mongoloid", "gyp", "redskin", "savage",
-    // requested words
-    "jew", "jews", "gay", "dress", "dresses",
+    // anti-Black
+    "nigger", "nigga", "niger", "coon", "jigaboo", "spook", "darkie", "darky",
+    "sambo", "negro", "groid", "porchmonkey", "junglebunny", "tarbaby",
+    "pickaninny", "golliwog", "moolie", "moulie", "buckwheat", "spearchucker",
+    // anti-white
+    "honky", "honkey", "cracker", "whitey", "gringo", "peckerwood", "wonderbread",
+    // anti-Latino
+    "spic", "spik", "beaner", "wetback", "greaser", "cholo",
+    // anti-Asian
+    "chink", "gook", "jap", "slant", "slanteye", "zipperhead",
+    "chingchong", "dink", "coolie", "chinaman",
+    // anti-Arab / Muslim
+    "raghead", "towelhead", "sandnigger", "cameljockey", "muzzie", "paki",
+    // anti-Native
+    "redskin", "injun", "squaw", "savage",
+    // anti-Jewish
+    "kike", "kyke", "heeb", "yid", "shylock", "hymie", "goy", "goyim",
+    "jew", "jews", "nazi", "hitler", "shekel",
+    // anti-LGBTQ
+    "faggot", "faggit", "fag", "dyke", "tranny", "homo", "poofter", "poof",
+    "shemale", "ladyboy", "queer", "gay",
+    // disability
+    "retard", "tard", "spastic", "spaz", "cripple", "mongoloid",
+    // Roma
+    "gyp", "gypsy",
+    // other requested words
+    "dress", "dresses",
     // general profanity
     "fuck", "shit", "bitch", "cunt", "pussy", "dick", "cock", "penis",
-    "vagina", "porn", "sex", "rape", "nazi", "hitler"
+    "vagina", "porn", "sex", "rape", "wop", "dago", "kraut", "kkk"
   ];
   function normName(s) {
     return String(s).toLowerCase()
