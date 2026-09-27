@@ -77,98 +77,10 @@
     </div>
   </div>
 
+  <script src="namefilter.js?v=1"></script>
   <script>
-    // block slurs / banned words as names (mirrors presence.js)
-    var BANNED = ["nigger","nigga","niger","coon","jigaboo","spook","darkie","darky",
-      "sambo","negro","groid","porchmonkey","junglebunny","tarbaby","pickaninny",
-      "golliwog","moolie","moulie","buckwheat","spearchucker",
-      "honky","honkey","cracker","whitey","gringo","peckerwood","wonderbread",
-      "spic","spik","beaner","wetback","greaser","cholo",
-      "chink","gook","jap","slant","slanteye","zipperhead","chingchong",
-      "dink","coolie","chinaman",
-      "raghead","towelhead","sandnigger","cameljockey","muzzie","paki",
-      "redskin","injun","squaw","savage",
-      "kike","kyke","heeb","yid","shylock","hymie","goy","goyim","jew","jews",
-      "nazi","hitler","shekel",
-      "faggot","faggit","fag","dyke","tranny","homo","poofter","poof","shemale",
-      "ladyboy","queer","gay",
-      "retard","tard","spastic","spaz","cripple","mongoloid",
-      "gyp","gypsy","dress","dresses",
-      "fuck","shit","bitch","cunt","pussy","dick","cock","penis","vagina",
-      "porn","sex","rape","wop","dago","kraut","kkk",
-      "niqqa","niqqer","niqa","knigger","fgt","phag","biatch","beetch",
-      "azn","kunt","phuk","phuck","shiit",
-      "jiggaboo","mooncricket","cottonpicker","spearchucka","nigglet",
-      "prairienigger","timbernigger","ofay","gweilo","redneck","hillbilly",
-      "trailertrash","inbred","greaseball","mojado","tacobender","wetneck",
-      "chinky","ching","chong","slopehead","buddhahead","riceball",
-      "haji","hadji","dunecoon","sandmonkey","camelfucker","muzzrat",
-      "sheeny","christkiller","ovendodger","chug","gyppo","pikey",
-      "fudgepacker","carpetmuncher","buttpirate","battyboy","fairy","poon",
-      "sped","windowlicker","veggie","whore","slut","faggy","homofag",
-      "jigg","wigger","wigga","hykes","hyke",
-      "asshole","arsehole","arse","jackass","dumbass","asshat","asswipe",
-      "bastard","twat","prick","wank","wanker","tosser","cum","cumshot",
-      "jizz","tits","titties","titty","boobs","boob","hoe","damn","crap",
-      "piss","bollocks","douche","dickhead","bullshit","motherfucker",
-      "dildo","boner","blowjob","handjob","jerkoff","anus","butthole",
-      "bugger","skank","thot","clit","schlong","wiener","knob","fanny",
-      "minge","horny","orgasm","masturbate","ejaculate","semen","scrotum",
-      "ballsack","nutsack","cameltoe","milf","gilf","hentai","coochie",
-      "choad","queef","smegma","cocksucker","cocksuck","cumming",
-      "csam","childporn","pedo","pedophile","loli","lolicon","shota","shotacon",
-      "jailbait","pthc","cheesepizza","groomer",
-      "pornhub","xvideos","xnxx","xhamster","onlyfans","brazzers","redtube",
-      "kys","kms"];
-    var ACRO=["cp","ph","jb","csam"];
-    function normName(s){
-      return String(s).toLowerCase()
-        .replace(/ph/g,"f").replace(/vv/g,"w")
-        .replace(/[0]/g,"o").replace(/[1!|]/g,"i").replace(/[3]/g,"e")
-        .replace(/[4@]/g,"a").replace(/[5$]/g,"s").replace(/[7+]/g,"t")
-        .replace(/[8]/g,"b").replace(/[6]/g,"g").replace(/[9]/g,"g")
-        .replace(/[()<>{}\[\]]/g,"c").replace(/[^a-z]/g,"");
-    }
-    function collapse(s){ return s.replace(/(.)\1+/g,"$1"); }
-    var BANNED_COLLAPSED=BANNED.map(collapse).filter(function(w){return w.length>=4;});
-    var STREET=/(street|avenue|\bave\b|\brd\b|road|\bln\b|lane|\bdr\b|drive|boulevard|\bblvd\b|\bct\b|court|circle|\bcir\b|\bway\b|place|\bpl\b|highway|\bhwy\b|terrace|\bter\b|\bapt\b|suite|\bste\b|\bunit\b|\bbox\b|\bpo\b|\bcrescent\b|\bcres\b|parkway|\bpkwy\b|\bloop\b|\btrail\b|\btrl\b)/;
-    var DIRN=/\b(north|south|east|west|n|s|e|w|ne|nw|se|sw)\b/;
-    function looksLikeAddress(s){
-      s=String(s).toLowerCase();
-      if(/\d{4,}/.test(s)) return true;
-      if(STREET.test(s)) return true;
-      if(/\d{1,6}\s*[a-z]/.test(s)) return true;
-      if(/[a-z]\s*\d{1,6}/.test(s)&&DIRN.test(s)) return true;
-      return false;
-    }
-    // catch a slur with one extra letter ("nigfger"), and the worst ones
-    // with a swapped letter or up to two extra letters mixed in
-    var FUZZY=["nigger","nigga","faggot","faggit","retard","beaner","raghead","towelhead",
-      "redskin","jigaboo","chinky","bitch","whore","pussy","fucker"];
-    var SEVERE=["nigger","nigga","faggot"];
-    function oneInserted(s,w){ for(var k=0;k<s.length;k++){ if(s.slice(0,k)+s.slice(k+1)===w) return true; } return false; }
-    function oneSwapped(s,w){ if(s[0]!==w[0]) return false; var d=0; for(var k=1;k<w.length;k++){ if(s[k]!==w[k]&&++d>1) return false; } return true; }
-    function spreadOut(s,w){ var k=0; for(var m=0;m<s.length&&k<w.length;m++){ if(s[m]===w[k]) k++; } return k===w.length&&s[0]===w[0]; }
-    function fuzzyHit(s){
-      var i,j,w;
-      for(i=0;i<FUZZY.length;i++){ w=FUZZY[i];
-        for(j=0;j+w.length+1<=s.length;j++){ if(oneInserted(s.substr(j,w.length+1),w)) return true; } }
-      for(i=0;i<SEVERE.length;i++){ w=SEVERE[i];
-        for(j=0;j+w.length<=s.length;j++){ if((w!=="nigga"&&oneSwapped(s.substr(j,w.length),w))||spreadOut(s.substr(j,w.length+2),w)) return true; } }
-      return false;
-    }
-    function nameBanned(s){
-      var acro=String(s).toLowerCase().replace(/[^a-z]/g,"");
-      if(ACRO.indexOf(acro)!==-1) return true;
-      var n=normName(s);
-      if(n){
-        for(var i=0;i<BANNED.length;i++){ if(n.indexOf(BANNED[i])!==-1) return true; }
-        var c=collapse(n);
-        for(var j=0;j<BANNED_COLLAPSED.length;j++){ if(c.indexOf(BANNED_COLLAPSED[j])!==-1) return true; }
-        if(fuzzyHit(n)||fuzzyHit(c)) return true;
-      }
-      return looksLikeAddress(s);
-    }
+    // name filter lives in namefilter.js (shared with the online list)
+    var normName=EduNameFilter.normName, nameBanned=EduNameFilter.isBanned;
     function ask(){
       var f=document.getElementById('namefield');
       f.classList.add('show');
