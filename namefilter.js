@@ -68,7 +68,9 @@
     // Hitler / nazi salutes and respellings
     "adolf", "hitla", "hitlar", "hitlor", "hitlur", "hitlir", "hitlah", "hitlr",
     "htler", "heilhitler", "siegheil", "seigheil", "sieghail", "fuhrer",
-    "fuehrer", "furher", "meinkampf", "natzi"
+    "fuehrer", "furher", "meinkampf", "natzi",
+    // 271 spelled out
+    "twoseventyone", "twoseventy1", "twohundredseventyone", "twosevenone"
   ];
 
 
@@ -226,6 +228,8 @@
     if (ACRO.indexOf(acro) !== -1) return true;   // exact short-code names
     // neo-nazi number codes: 1488 / 14-88, or 88 on its own
     if (/14\D{0,3}88/.test(name) || /^\W*88\W*$/.test(name)) return true;
+    // 271, also split up ("2 7 1", "2.7.1") or with l / i / ! for the 1
+    if (/27[1li!|]/.test(fold(name).replace(/[\s._\-,:;'"*~+=\/\\]/g, ""))) return true;
     var n = normName(name);
     if (n) {
       var c = collapse(n), p = soundAlike(n), pc = collapse(p);
