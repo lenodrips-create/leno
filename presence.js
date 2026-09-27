@@ -128,6 +128,46 @@
     if (/[a-z]\s*\d{1,6}/.test(s) && DIRN.test(s)) return true;
     return false;
   }
+  // Catch a slur with one extra letter slipped in ("nigfger"), and the worst
+  // ones with a swapped letter or up to two extra letters mixed in.
+  var FUZZY = ["nigger", "nigga", "faggot", "faggit", "retard", "beaner",
+    "raghead", "towelhead", "redskin", "jigaboo", "chinky", "bitch", "whore",
+    "pussy", "fucker"];
+  var SEVERE = ["nigger", "nigga", "faggot"];
+  function oneInserted(s, w) {           // s is w with one extra letter
+    for (var k = 0; k < s.length; k++) {
+      if (s.slice(0, k) + s.slice(k + 1) === w) return true;
+    }
+    return false;
+  }
+  function oneSwapped(s, w) {            // one letter changed, not the first
+    if (s[0] !== w[0]) return false;
+    var diff = 0;
+    for (var k = 1; k < w.length; k++) if (s[k] !== w[k] && ++diff > 1) return false;
+    return true;
+  }
+  function spreadOut(s, w) {             // w's letters in order, starting at s[0]
+    var k = 0;
+    for (var m = 0; m < s.length && k < w.length; m++) if (s[m] === w[k]) k++;
+    return k === w.length && s[0] === w[0];
+  }
+  function fuzzyHit(s) {
+    var i, j, w;
+    for (i = 0; i < FUZZY.length; i++) {
+      w = FUZZY[i];
+      for (j = 0; j + w.length + 1 <= s.length; j++) {
+        if (oneInserted(s.substr(j, w.length + 1), w)) return true;
+      }
+    }
+    for (i = 0; i < SEVERE.length; i++) {
+      w = SEVERE[i];
+      for (j = 0; j + w.length <= s.length; j++) {
+        if (w !== "nigga" && oneSwapped(s.substr(j, w.length), w)) return true;
+        if (spreadOut(s.substr(j, w.length + 2), w)) return true;
+      }
+    }
+    return false;
+  }
   function isBanned(name) {
     var acro = String(name).toLowerCase().replace(/[^a-z]/g, "");
     if (ACRO.indexOf(acro) !== -1) return true;   // exact short-code names
@@ -140,6 +180,7 @@
       for (var j = 0; j < BANNED_COLLAPSED.length; j++) {
         if (c.indexOf(BANNED_COLLAPSED[j]) !== -1) return true;
       }
+      if (fuzzyHit(n) || fuzzyHit(c)) return true;
     }
     return looksLikeAddress(name);
   }
