@@ -78,7 +78,17 @@
     "sheeny", "christkiller", "ovendodger", "chug", "gyppo", "pikey",
     "fudgepacker", "carpetmuncher", "buttpirate", "battyboy", "fairy", "poon",
     "sped", "windowlicker", "veggie", "whore", "slut", "faggy", "homofag",
-    "chinaman", "jigg", "wigger", "wigga", "hykes", "hyke"
+    "chinaman", "jigg", "wigger", "wigga", "hykes", "hyke",
+    // profanity (full send)
+    "asshole", "arsehole", "arse", "jackass", "dumbass", "asshat", "asswipe",
+    "bastard", "twat", "prick", "wank", "wanker", "tosser", "cum", "cumshot",
+    "jizz", "tits", "titties", "titty", "boobs", "boob", "hoe", "damn", "crap",
+    "piss", "bollocks", "douche", "dickhead", "bullshit", "motherfucker",
+    "dildo", "boner", "blowjob", "handjob", "jerkoff", "anus", "butthole",
+    "bugger", "skank", "thot", "clit", "schlong", "wiener", "knob", "fanny",
+    "minge", "horny", "orgasm", "masturbate", "ejaculate", "semen", "scrotum",
+    "ballsack", "nutsack", "cameltoe", "milf", "gilf", "hentai", "coochie",
+    "choad", "queef", "smegma", "cocksucker", "cocksuck", "cumming"
   ];
   // Fold symbol/letter lookalikes and leet so "n1_gg3r", "phaggot", "|<ike" all
   // reduce to plain letters before matching.
