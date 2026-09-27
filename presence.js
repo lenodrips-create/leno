@@ -190,6 +190,56 @@
         setStatus("offline — database blocked this read");
         console.error("[presence] read denied — check Realtime Database rules:", err);
       });
+
+    // site pause: dev gets a toggle, everyone else gets the "be right back" screen
+    if (myDev) buildDevControls();
+    db.ref("site/paused").on("value", function (s) {
+      sitePaused = !!(s && s.val());
+      applyPause();
+      updateDevBtn();
+    });
+  }
+
+  // ---- site pause ----------------------------------------------------------
+  var sitePaused = false, devBtn = null, maintEl = null;
+
+  function buildDevControls() {
+    if (devBtn) return;
+    devBtn = document.createElement("button");
+    devBtn.type = "button";
+    devBtn.style.cssText = "display:inline-flex;align-items:center;gap:7px;padding:8px 13px;" +
+      "border-radius:999px;border:1px solid #3a2a2a;background:#1a1214;color:#ff8a8a;" +
+      "font:inherit;font-size:13px;font-weight:700;cursor:pointer;margin-right:8px;order:-2;flex:none";
+    devBtn.addEventListener("click", function () {
+      if (!db) return;
+      db.ref("site/paused").set(!sitePaused);
+    });
+    var header = document.querySelector(".top");
+    if (header) header.insertBefore(devBtn, header.firstChild);
+    else { devBtn.style.position = "fixed"; devBtn.style.top = "54px"; devBtn.style.left = "12px"; devBtn.style.zIndex = "9000"; document.body.appendChild(devBtn); }
+    updateDevBtn();
+  }
+  function updateDevBtn() {
+    if (!devBtn) return;
+    devBtn.textContent = sitePaused ? "▶ unpause site" : "⏸ pause site";
+  }
+
+  function applyPause() {
+    if (sitePaused && !myDev) {
+      if (maintEl) return;
+      maintEl = document.createElement("div");
+      maintEl.style.cssText = "position:fixed;inset:0;z-index:2147483646;background:#0a0a0c;" +
+        "display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;" +
+        "color:#fff;font-family:inherit;padding:24px";
+      maintEl.innerHTML =
+        '<div style="font-size:64px;margin-bottom:10px">🚧</div>' +
+        '<div style="font-size:30px;font-weight:800;margin-bottom:8px">be right back</div>' +
+        '<div style="font-size:16px;color:#8b8f9c;max-width:340px">the site is paused for maintenance — check back soon.</div>';
+      document.body.appendChild(maintEl);
+    } else if (maintEl) {
+      maintEl.parentNode.removeChild(maintEl);
+      maintEl = null;
+    }
   }
 
   function write() {
