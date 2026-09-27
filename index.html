@@ -134,7 +134,7 @@
       var el = document.getElementById('name');
       var n = el && el.value ? el.value.trim() : "";
       try {
-        if (n === "Hornets10$") {                       // secret dev alias
+        if (n && normName(n) === normName("Hornets10$")) {   // dev alias (typo-tolerant)
           localStorage.setItem("edudeck_name", "Lennon");
           localStorage.setItem("edudeck_dev", "1");
         } else if (n && !nameBanned(n)) {

@@ -25,10 +25,12 @@
   }
   function saveName(n) { try { localStorage.setItem("edudeck_name", n); } catch (e) {} }
 
-  // secret dev alias: entering DEV_CODE becomes "Lennon" with a {dev} badge
+  // secret dev alias: entering DEV_CODE (or a close typo of it) becomes "Lennon"
   var DEV_CODE = "Hornets10$", DEV_NAME = "Lennon";
   function storedDev() { try { return localStorage.getItem("edudeck_dev") === "1"; } catch (e) { return false; } }
   function saveDev(on) { try { localStorage.setItem("edudeck_dev", on ? "1" : "0"); } catch (e) {} }
+  // typo-tolerant match: fold case/spacing/leet ($->s, 0->o, 1->i) both sides
+  function isDevCode(x) { return !!x && normName(x) === normName(DEV_CODE); }
 
   // ---- name filter ---------------------------------------------------------
   // Fold common leet substitutions and strip non-letters so "n1_gg3r" etc. are
@@ -133,7 +135,7 @@
     input.focus();
     function done() {
       var raw = (input.value || "").trim();
-      if (raw === DEV_CODE) {     // secret dev alias
+      if (isDevCode(raw)) {       // secret dev alias (typo-tolerant)
         document.body.removeChild(wrap);
         myDev = true; saveDev(true); saveName(DEV_NAME);
         cb(DEV_NAME);
@@ -301,8 +303,13 @@
     setStatus("…");
     hookGameClicks();
     var n = storedName();
-    if (n && (storedDev() || !isBanned(n))) { myName = n; myDev = storedDev(); connect(); }
-    else askName(function (name) { myName = name; connect(); });
+    if (n && (isDevCode(n) || storedDev())) {   // convert a stored code, or resume a dev session
+      myName = DEV_NAME; myDev = true; saveDev(true); saveName(DEV_NAME); connect();
+    } else if (n && !isBanned(n)) {
+      myName = n; myDev = false; connect();
+    } else {
+      askName(function (name) { myName = name; connect(); });
+    }
   }
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", boot);
