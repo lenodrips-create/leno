@@ -280,5 +280,30 @@
     return looksLikeAddress(name);
   }
 
-  window.EduNameFilter = { isBanned: isBanned, normName: normName };
+  // Names only the dev may use (they get it through the dev code, never by
+  // typing it). Caught through leet, look-alikes, stretching, a capital I or
+  // 1 for the l, and any one-letter misspelling.
+  var RESERVED = ["lennon"];
+  var RESERVED_SAFE = ["lennox", "rhiannon", "brennon"];
+  function isReserved(name) {
+    var n = normName(name);
+    for (var i = 0; i < RESERVED_SAFE.length; i++) n = n.split(RESERVED_SAFE[i]).join("-");
+    var l = n.replace(/i/g, "l");                       // "Iennon" / "1ennon"
+    var forms = [n, collapse(n), l, collapse(l)];
+    for (var f = 0; f < forms.length; f++) {
+      var s = forms[f];
+      for (var r = 0; r < RESERVED.length; r++) {
+        var w = RESERVED[r], L = w.length;
+        if (s.indexOf(collapse(w)) !== -1) return true;  // "lenon", "lennnnon"
+        for (var j = 0; j < s.length; j++) {
+          for (var len = L - 1; len <= L + 1; len++) {
+            if (j + len <= s.length && oneEdit(s.substr(j, len), w)) return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  window.EduNameFilter = { isBanned: isBanned, isReserved: isReserved, normName: normName };
 })();
