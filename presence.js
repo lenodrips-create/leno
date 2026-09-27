@@ -36,6 +36,8 @@
   var NF = window.EduNameFilter;
   function normName(s) { return NF.normName(s); }
   function isBanned(name) { return NF.isBanned(name); }
+  // "Lennon" is the dev's: only reachable through the dev code
+  function notAllowed(name) { return NF.isBanned(name) || NF.isReserved(name); }
 
   function askName(cb) {
     var wrap = document.createElement("div");
@@ -68,7 +70,7 @@
         return;
       }
       var n = raw || "guest";
-      if (isBanned(n)) {          // reject and let them try again
+      if (notAllowed(n)) {        // reject and let them try again
         err.style.display = "block";
         input.value = "";
         input.focus();
@@ -243,8 +245,11 @@
       if (!all.hasOwnProperty(k)) continue;
       var u = all[k];
       if (!u) continue;
-      // purge anyone who slipped in with a banned name
-      if (isBanned(u.name)) { try { if (db) db.ref("presence/" + k).remove(); } catch (e) {} continue; }
+      // purge anyone who slipped in with a banned name, or posing as the dev
+      if (isBanned(u.name) || (!u.dev && NF.isReserved(u.name))) {
+        try { if (db) db.ref("presence/" + k).remove(); } catch (e) {}
+        continue;
+      }
       if (!u.ts || now - u.ts > ACTIVE_MS) continue;
       rows.push(u);
     }
@@ -288,7 +293,7 @@
     var n = storedName();
     if (n && (isDevCode(n) || storedDev())) {   // convert a stored code, or resume a dev session
       myName = DEV_NAME; myDev = true; saveDev(true); saveName(DEV_NAME); connect();
-    } else if (n && !isBanned(n)) {
+    } else if (n && !notAllowed(n)) {
       myName = n; myDev = false; connect();
     } else {
       askName(function (name) { myName = name; connect(); });

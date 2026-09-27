@@ -77,10 +77,12 @@
     </div>
   </div>
 
-  <script src="namefilter.js?v=4"></script>
+  <script src="namefilter.js?v=5"></script>
   <script>
     // name filter lives in namefilter.js (shared with the online list)
-    var normName=EduNameFilter.normName, nameBanned=EduNameFilter.isBanned;
+    var normName=EduNameFilter.normName;
+    // "Lennon" is the dev's: only reachable through the dev code below
+    function nameBanned(s){ return EduNameFilter.isBanned(s)||EduNameFilter.isReserved(s); }
     function ask(){
       var f=document.getElementById('namefield');
       f.classList.add('show');
