@@ -232,9 +232,8 @@
         "display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;" +
         "color:#fff;font-family:inherit;padding:24px";
       maintEl.innerHTML =
-        '<div style="font-size:64px;margin-bottom:10px">🚧</div>' +
-        '<div style="font-size:30px;font-weight:800;margin-bottom:8px">be right back</div>' +
-        '<div style="font-size:16px;color:#8b8f9c;max-width:340px">the site is paused for maintenance — check back soon.</div>';
+        '<div style="font-size:64px;margin-bottom:14px">👀</div>' +
+        '<div style="font-size:34px;font-weight:800">pay attention to the teacher</div>';
       document.body.appendChild(maintEl);
     } else if (maintEl) {
       maintEl.parentNode.removeChild(maintEl);
