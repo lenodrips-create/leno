@@ -64,25 +64,37 @@
     "kys", "kms",
     // sound-alike / respelled variants
     "faj", "fahg", "fagg", "nigguh", "niggah", "nigguz", "nigha", "nigah",
-    "neeger", "kneegrow", "neegrow", "nignog", "spyc"
+    "neeger", "kneegrow", "neegrow", "nignog", "spyc",
+    // Hitler / nazi salutes and respellings
+    "adolf", "hitla", "hitlar", "hitlor", "hitlur", "hitlir", "hitlah", "hitlr",
+    "htler", "heilhitler", "siegheil", "seigheil", "sieghail", "fuhrer",
+    "fuehrer", "furher", "meinkampf", "natzi"
   ];
 
 
   // Short codes matched only as the WHOLE name (before ph->f folding) so they
   // don't clobber "Phil", "Joseph", "cupid", etc.
-  var ACRO = ["cp", "ph", "jb", "csam"];
+  var ACRO = ["cp", "ph", "jb", "csam", "hh"];
   // Too short to match inside other names, but blocked as the whole name.
-  var WHOLE = ["nig", "nigs", "nigz", "nigg", "nigr", "fqg", "fgs"];
+  var WHOLE = ["nig", "nigs", "nigz", "nigg", "nigr", "fqg", "fgs", "heil"];
+  // Real names that look like a misspelled slur; removed before the fuzzy
+  // checks ("randolph" is "adolf" with an extra letter).
+  var SAFE = ["randolf", "whistl"];
 
   // The worst slurs get the extra checks below (misspellings, sound-alikes).
-  var SEVERE = ["nigger", "nigga", "faggot"];
+  var SEVERE = ["nigger", "nigga", "faggot", "hitler", "adolf"];
+  // These skip the swapped-letter check: it would hit "enigma", "benign",
+  // "hitter" and "adolescent".
+  var NO_SWAP = ["nigga", "hitler", "adolf"];
+  // And this one skips the missing-letter check ("hitter", "chiller").
+  var NO_DROP = ["hitler"];
   // Roots checked against the sound-alike version of the name.
   var SOUND_ROOTS = ["nigger", "nigga", "niger", "niga", "faggot", "fagot",
-    "fag", "chink"];
+    "fag", "chink", "hitler", "hitla", "adolf"];
   // Slurs caught with one extra letter slipped in ("nigfger").
   var FUZZY = ["nigger", "nigga", "faggot", "faggit", "retard", "beaner",
     "raghead", "towelhead", "redskin", "jigaboo", "chinky", "bitch", "whore",
-    "pussy", "fucker"];
+    "pussy", "fucker", "hitler", "adolf"];
 
   // Letters from other alphabets that look like latin ones (Cyrillic, Greek,
   // IPA). Accents and fancy/fullwidth fonts are handled by NFKD below.
@@ -177,6 +189,7 @@
   }
   function fuzzyHit(s) {
     var i, j, w, L;
+    for (i = 0; i < SAFE.length; i++) s = s.split(SAFE[i]).join("-");
     for (i = 0; i < FUZZY.length; i++) {
       w = FUZZY[i];
       for (j = 0; j + w.length + 1 <= s.length; j++) {
@@ -186,10 +199,9 @@
     for (i = 0; i < SEVERE.length; i++) {
       w = SEVERE[i]; L = w.length;
       for (j = 0; j < s.length; j++) {
-        // "nigga" skips the swap check: it would hit "enigma" and "benign"
-        if (w !== "nigga" && oneSwapped(s.substr(j, L), w)) return true;
+        if (NO_SWAP.indexOf(w) === -1 && oneSwapped(s.substr(j, L), w)) return true;
         if (transposed(s.substr(j, L), w)) return true;
-        if (L >= 6 && oneDropped(s.substr(j, L - 1), w)) return true;
+        if (L >= 6 && NO_DROP.indexOf(w) === -1 && oneDropped(s.substr(j, L - 1), w)) return true;
         // up to two extra letters mixed in (one for the short "nigga")
         if (spreadOut(s.substr(j, L + (L >= 6 ? 2 : 1)), w)) return true;
       }
@@ -212,13 +224,15 @@
   function isBanned(name) {
     var acro = fold(name).replace(/[^a-z]/g, "");
     if (ACRO.indexOf(acro) !== -1) return true;   // exact short-code names
+    // neo-nazi number codes: 1488 / 14-88, or 88 on its own
+    if (/14\D{0,3}88/.test(name) || /^\W*88\W*$/.test(name)) return true;
     var n = normName(name);
     if (n) {
       var c = collapse(n), p = soundAlike(n), pc = collapse(p);
       if (WHOLE.indexOf(n) !== -1 || WHOLE.indexOf(c) !== -1 || WHOLE.indexOf(pc) !== -1) return true;
       if (contains(n, BANNED) || contains(c, BANNED_COLLAPSED)) return true;
       if (contains(p, SOUND_ROOTS) || contains(pc, SOUND_ROOTS)) return true;
-      if (contains(reverse(n), ["nigger", "faggot"])) return true;   // "reggin"
+      if (contains(reverse(n), ["nigger", "faggot", "hitler", "adolf"])) return true;   // "reggin"
       if (fuzzyHit(n) || fuzzyHit(c) || fuzzyHit(p) || fuzzyHit(pc)) return true;
     }
     return looksLikeAddress(name);
