@@ -1,7 +1,8 @@
-/* Site pause for game / movie / app pages. When the dev pauses the site this
-   covers the page with the "pay attention to the teacher" screen, even in the
-   middle of a game: it leaves fullscreen, mutes audio and swallows key/mouse
-   input until the site is unpaused. The dev (edudeck_dev flag) bypasses.
+/* Site pause, used on every page. When the dev pauses the site this opens
+   code.org in a new tab and covers the page with the "pay attention to the
+   teacher" screen, even in the middle of a game: it leaves fullscreen, mutes
+   audio and swallows key/mouse input until the site is unpaused. The dev
+   (edudeck_dev flag) bypasses.
    Talks to the database over its REST stream instead of the Firebase SDK so it
    can't clash with whatever scripts a game ships with. */
 (function () {
@@ -9,9 +10,11 @@
   window.__edudeckPause = true;
 
   var URL = "https://edudeck-1dc1b-default-rtdb.firebaseio.com/site/paused.json";
-  var isDev = false;
-  try { isDev = localStorage.getItem("edudeck_dev") === "1"; } catch (e) {}
-  if (isDev) return;
+  var COVER_SITE = "https://code.org/en-US";
+  // read every time: the dev may type the dev code after this page loaded
+  function isDev() {
+    try { return localStorage.getItem("edudeck_dev") === "1"; } catch (e) { return false; }
+  }
 
   // Track Web Audio contexts (Unity, Ruffle, ...) so they can be silenced.
   var contexts = [];
@@ -28,10 +31,33 @@
     window[k] = Tracked;
   });
 
-  var paused = false, el = null, media = [], timer = null;
+  var paused = false, el = null, media = [], timer = null, wantTab = false;
+
+  // Open code.org once per pause, even with several of our tabs open.
+  // Browsers only allow a new tab straight away if pop-ups are allowed for the
+  // site; otherwise it opens on the student's next click or key press.
+  function tabOpenedRecently() {
+    try { return Date.now() - Number(localStorage.getItem("edudeck_cover_tab") || 0) < 60000; }
+    catch (e) { return false; }
+  }
+  function openCoverTab() {
+    if (tabOpenedRecently()) { wantTab = false; return; }
+    var w = null;
+    try { w = window.open(COVER_SITE, "_blank"); } catch (e) {}
+    if (w) {
+      try { w.opener = null; } catch (e) {}
+      try { localStorage.setItem("edudeck_cover_tab", String(Date.now())); } catch (e) {}
+      wantTab = false;
+    } else {
+      wantTab = true;
+    }
+  }
 
   function block(e) {
     if (!paused) return;
+    // any real click / tap / key press counts ("pointerdown" comes first, and
+    // blocking it cancels the "mousedown" that would follow)
+    if (wantTab && /^(pointerdown|pointerup|mousedown|mouseup|click|keydown|keyup|touchend)$/.test(e.type)) openCoverTab();
     e.stopImmediatePropagation();
     if (e.cancelable) e.preventDefault();
   }
@@ -67,6 +93,7 @@
 
   function show() {
     paused = true;
+    openCoverTab();
     cover();
     leaveFullscreen();
     try { if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); } catch (e) {}
@@ -82,6 +109,7 @@
   }
   function hide() {
     paused = false;
+    wantTab = false;
     if (timer) { clearInterval(timer); timer = null; }
     if (el && el.parentNode) el.parentNode.removeChild(el);
     media.forEach(function (m) { try { var r = m.play(); if (r && r.catch) r.catch(function () {}); } catch (e) {} });
@@ -91,6 +119,7 @@
     });
   }
   function apply(v) {
+    if (v === true && isDev()) v = false;
     if (v === true && !paused) show();
     else if (v !== true && paused) hide();
   }

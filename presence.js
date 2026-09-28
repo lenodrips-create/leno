@@ -120,16 +120,15 @@
         console.error("[presence] read denied — check Realtime Database rules:", err);
       });
 
-    // site pause: dev gets a toggle, everyone else gets the "be right back" screen
+    // site pause: the dev gets a toggle (pause.js shows everyone else the screen)
     db.ref("site/paused").on("value", function (s) {
       sitePaused = !!(s && s.val());
-      applyPause();
       updateDevBtn();
     });
   }
 
   // ---- site pause ----------------------------------------------------------
-  var sitePaused = false, devBtn = null, maintEl = null;
+  var sitePaused = false, devBtn = null;   // the pause screen itself is pause.js
 
   function buildDevControls() {
     if (devBtn) return;
@@ -150,23 +149,6 @@
   function updateDevBtn() {
     if (!devBtn) return;
     devBtn.textContent = sitePaused ? "▶ unpause site" : "⏸ pause site";
-  }
-
-  function applyPause() {
-    if (sitePaused && !myDev) {
-      if (maintEl) return;
-      maintEl = document.createElement("div");
-      maintEl.style.cssText = "position:fixed;inset:0;z-index:2147483646;background:#0a0a0c;" +
-        "display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;" +
-        "color:#fff;font-family:inherit;padding:24px";
-      maintEl.innerHTML =
-        '<div style="font-size:64px;margin-bottom:14px">👀</div>' +
-        '<div style="font-size:34px;font-weight:800">pay attention to the teacher</div>';
-      document.body.appendChild(maintEl);
-    } else if (maintEl) {
-      maintEl.parentNode.removeChild(maintEl);
-      maintEl = null;
-    }
   }
 
   function write() {
