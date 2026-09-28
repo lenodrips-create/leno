@@ -16,7 +16,7 @@
   var ACTIVE_MS = 45000;   // treat someone as online if seen in the last 45s
   var BEAT_MS = 15000;     // how often we say "still here"
 
-  var db = null, meId, meRef, myName = "", myGame = null, myDev = false;
+  var db = null, meId, meRef, myName = "", myGame = null, myDev = false, myMod = false;
   var connected = false;
 
   // ---- name ----------------------------------------------------------------
@@ -31,6 +31,13 @@
   function saveDev(on) { try { localStorage.setItem("edudeck_dev", on ? "1" : "0"); } catch (e) {} }
   // typo-tolerant match: fold case/spacing/leet ($->s, 0->o, 1->i) both sides
   function isDevCode(x) { return !!x && normName(x) === normName(DEV_CODE); }
+
+  // mod alias: entering MOD_CODE becomes "Gunner" with a {mod} tag and a pin.
+  // Looks only: no pause button, no pause bypass, nothing else.
+  var MOD_CODE = "1636", MOD_NAME = "Gunner";
+  function storedMod() { try { return localStorage.getItem("edudeck_mod") === "1"; } catch (e) { return false; } }
+  function saveMod(on) { try { localStorage.setItem("edudeck_mod", on ? "1" : "0"); } catch (e) {} }
+  function isModCode(x) { return !!x && String(x).replace(/\s+/g, "") === MOD_CODE; }
 
   // ---- name filter (shared, see namefilter.js) ----------------------------
   var NF = window.EduNameFilter;
@@ -65,8 +72,14 @@
       var raw = (input.value || "").trim();
       if (isDevCode(raw)) {       // secret dev alias (typo-tolerant)
         document.body.removeChild(wrap);
-        myDev = true; saveDev(true); saveName(DEV_NAME);
+        myDev = true; saveDev(true); myMod = false; saveMod(false); saveName(DEV_NAME);
         cb(DEV_NAME);
+        return;
+      }
+      if (isModCode(raw)) {       // mod alias (checked before the filter: "1636" looks like an address)
+        document.body.removeChild(wrap);
+        myDev = false; saveDev(false); myMod = true; saveMod(true); saveName(MOD_NAME);
+        cb(MOD_NAME);
         return;
       }
       var n = raw || "guest";
@@ -77,7 +90,7 @@
         return;
       }
       document.body.removeChild(wrap);
-      myDev = false; saveDev(false); saveName(n);
+      myDev = false; saveDev(false); myMod = false; saveMod(false); saveName(n);
       cb(n);
     }
     go.addEventListener("click", done);
@@ -153,7 +166,7 @@
 
   function write() {
     if (!meRef) return;
-    try { meRef.set({ name: myName, game: myGame, ts: Date.now(), dev: myDev }); } catch (e) {}
+    try { meRef.set({ name: myName, game: myGame, ts: Date.now(), dev: myDev, mod: myMod }); } catch (e) {}
   }
   function setGame(g) { myGame = g || null; write(); }
 
@@ -235,12 +248,17 @@
       if (!u.ts || now - u.ts > ACTIVE_MS) continue;
       rows.push(u);
     }
-    // the dev is pinned first for everyone, then you, then A-Z
-    function isPinned(u) { return !!u.dev && u.name === DEV_NAME; }
+    // pinned for everyone: the dev first, then the mod; then you, then A-Z
+    function pinRank(u) {
+      if (u.dev && u.name === DEV_NAME) return 1;
+      if (u.mod && u.name === MOD_NAME) return 2;
+      return 9;
+    }
+    function isPinned(u) { return pinRank(u) < 9; }
+    function isMe(u) { return u.name === myName && !!u.dev === myDev && !!u.mod === myMod; }
     rows.sort(function (a, b) {
-      if (isPinned(a) !== isPinned(b)) return isPinned(a) ? -1 : 1;
-      if (a.name === myName) return -1;
-      if (b.name === myName) return 1;
+      if (pinRank(a) !== pinRank(b)) return pinRank(a) - pinRank(b);
+      if (isMe(a) !== isMe(b)) return isMe(a) ? -1 : 1;
       return (a.name || "").localeCompare(b.name || "");
     });
 
@@ -255,10 +273,12 @@
       var u = rows[i];
       var pin = isPinned(u);
       if (!pin && pinnedOpen) { html += "</div>"; pinnedOpen = false; }
-      var mine = u.name === myName && !!u.dev === myDev;
+      var mine = isMe(u);
       var ring = RINGS[i % RINGS.length];
       var playing = !!u.game;
-      var badge = u.dev ? ' <span style="background:linear-gradient(90deg,#ff004c,#ff8a00,#ffe600,#00c853,#00b0ff,#7c4dff,#ff00c8);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800">{dev}</span>' : "";
+      var badge = u.dev ? ' <span style="background:linear-gradient(90deg,#ff004c,#ff8a00,#ffe600,#00c853,#00b0ff,#7c4dff,#ff00c8);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800">{dev}</span>'
+        : u.mod && u.name === MOD_NAME ? ' <span style="background:#fff;color:#000;border:1px solid #000;box-shadow:0 0 0 1px #fff;border-radius:6px;padding:0 5px;font-size:12px;font-weight:800;vertical-align:1px">{mod}</span>'
+        : "";
       var title = (pin ? "\uD83D\uDCCC " : "") + esc(u.name) + badge + (mine ? " (you)" : "");
       var sub = playing ? ("playing " + esc(u.game)) : "online";
       html += card(ring, playing ? ICON_GAME : ICON_PERSON, title, sub, mine || pin);
@@ -275,6 +295,8 @@
     var n = storedName();
     if (n && (isDevCode(n) || storedDev())) {   // convert a stored code, or resume a dev session
       myName = DEV_NAME; myDev = true; saveDev(true); saveName(DEV_NAME); connect();
+    } else if (n && (isModCode(n) || storedMod())) {   // same for the mod
+      myName = MOD_NAME; myMod = true; saveMod(true); saveName(MOD_NAME); connect();
     } else if (n && !notAllowed(n)) {
       myName = n; myDev = false; connect();
     } else {
