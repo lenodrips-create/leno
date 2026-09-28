@@ -69,8 +69,11 @@
     "adolf", "hitla", "hitlar", "hitlor", "hitlur", "hitlir", "hitlah", "hitlr",
     "htler", "htlr", "heilhitler", "siegheil", "seigheil", "sieghail", "fuhrer",
     "fuehrer", "furher", "meinkampf", "natzi",
-    // 271 spelled out
-    "twoseventyone", "twoseventy1", "twohundredseventyone", "twosevenone"
+    // 271 / 336 spelled out
+    "twoseventyone", "twoseventy1", "twohundredseventyone", "twosevenone",
+    "threethreesix", "threethirtysix", "threethirty6", "threehundredthirtysix",
+    // Israel respellings
+    "yisrael", "isrl"
   ];
 
 
@@ -89,8 +92,8 @@
   var NO_SWAP = ["nigga"];
   // Caught with ANY one-letter change (added, missing, swapped, flipped) or
   // two extra letters; real words that land within that are in DEEP_SAFE.
-  var DEEP = ["hitler", "adolf"];
-  var DEEP_SAFE = ["randolf", "rudolf", "rodolf", "adolesc", "dolfin", "ladelf",
+  var DEEP = ["hitler", "adolf", "israel"];
+  var DEEP_SAFE = ["ismael", "israfel", "randolf", "rudolf", "rodolf", "adolesc", "dolfin", "ladelf",
     "leadof", "hitter", "hiller", "hither", "whiter", "whittl", "whistl",
     "littler", "shuttl", "wheel", "heel", "whitle"];
   // Roots checked against the sound-alike version of the name.
@@ -262,8 +265,9 @@
     if (ACRO.indexOf(acro) !== -1) return true;   // exact short-code names
     // neo-nazi number codes: 1488 / 14-88, or 88 on its own
     if (/14\D{0,3}88/.test(name) || /^\W*88\W*$/.test(name)) return true;
-    // 271, also split up ("2 7 1", "2.7.1") or with l / i / ! for the 1
-    if (/27[1li!|]/.test(fold(name).replace(/[\s._\-,:;'"*~+=\/\\]/g, ""))) return true;
+    // 271 and 336, also split up ("2 7 1", "3.3.6") or with l / i / ! for the 1
+    var digits = fold(name).replace(/[\s._\-,:;'"*~+=\/\\]/g, "");
+    if (/27[1li!|]/.test(digits) || /336/.test(digits)) return true;
     var n = normName(name);
     if (n) {
       var c = collapse(n), p = soundAlike(n), pc = collapse(p);
