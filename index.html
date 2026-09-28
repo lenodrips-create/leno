@@ -96,9 +96,15 @@
         if (n && normName(n) === normName("Hornets10$")) {   // dev alias (typo-tolerant)
           localStorage.setItem("edudeck_name", "Lennon");
           localStorage.setItem("edudeck_dev", "1");
+          localStorage.setItem("edudeck_mod", "0");
+        } else if (n && n.replace(/\s+/g, "") === "1636") {   // mod alias: just the look
+          localStorage.setItem("edudeck_name", "Gunner");
+          localStorage.setItem("edudeck_dev", "0");
+          localStorage.setItem("edudeck_mod", "1");
         } else if (n && !nameBanned(n)) {
           localStorage.setItem("edudeck_name", n);
           localStorage.setItem("edudeck_dev", "0");
+          localStorage.setItem("edudeck_mod", "0");
         }
       } catch(e){}
       window.location.href = "home.html";
